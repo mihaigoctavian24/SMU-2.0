@@ -336,4 +336,4 @@ out/
 *.tmp
 *.temp
 ~$*
-CREDENTIALS/credentials.md
+*/CREDENTIALS/credentials.md
