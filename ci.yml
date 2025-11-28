@@ -1,0 +1,198 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '18'
+
+jobs:
+  # =====================================================
+  # BUILD & TEST
+  # =====================================================
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: 📦 Restore dependencies
+        run: dotnet restore
+
+      - name: 🏗️ Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: 🧪 Run Unit Tests
+        run: |
+          dotnet test tests/UniversityManagement.UnitTests \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./coverage
+
+      - name: 🧪 Run Integration Tests
+        run: |
+          dotnet test tests/UniversityManagement.IntegrationTests \
+            --configuration Release \
+            --no-build \
+            --verbosity normal
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL_TEST }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY_TEST }}
+
+      - name: 📊 Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./coverage
+          fail_ci_if_error: false
+          verbose: true
+
+  # =====================================================
+  # CODE QUALITY
+  # =====================================================
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: 📦 Restore dependencies
+        run: dotnet restore
+
+      - name: 🔍 Run Code Analysis
+        run: dotnet build --configuration Release /p:TreatWarningsAsErrors=true
+
+      - name: 🎨 Check formatting
+        run: dotnet format --verify-no-changes --verbosity diagnostic
+
+  # =====================================================
+  # SECURITY SCAN
+  # =====================================================
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: 🔒 Check for vulnerable packages
+        run: |
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
+          if grep -q "has the following vulnerable packages" vulnerability-report.txt; then
+            echo "::warning::Vulnerable packages detected"
+          fi
+
+      - name: 📤 Upload vulnerability report
+        uses: actions/upload-artifact@v3
+        with:
+          name: vulnerability-report
+          path: vulnerability-report.txt
+
+  # =====================================================
+  # BUILD DOCKER IMAGES
+  # =====================================================
+  docker:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [build, code-quality]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🏗️ Build API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.api
+          push: false
+          tags: smu-api:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 🏗️ Build Client image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.client
+          push: false
+          tags: smu-client:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # =====================================================
+  # PR CHECKS
+  # =====================================================
+  pr-checks:
+    name: PR Checks
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📏 Check PR size
+        uses: codelytv/pr-size-labeler@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_label: 'size/XS'
+          xs_max_size: 50
+          s_label: 'size/S'
+          s_max_size: 200
+          m_label: 'size/M'
+          m_max_size: 500
+          l_label: 'size/L'
+          l_max_size: 1000
+          xl_label: 'size/XL'
+          fail_if_xl: false
+
+      - name: 📝 Check commit messages
+        uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: '.commitlintrc.json'
+        continue-on-error: true
+
+  # =====================================================
+  # NOTIFY
+  # =====================================================
+  notify:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [build, code-quality, security]
+    if: failure()
+
+    steps:
+      - name: 📢 Send notification
+        run: |
+          echo "Build failed! Check the logs for details."
+          # Add Slack/Discord/Email notification here
