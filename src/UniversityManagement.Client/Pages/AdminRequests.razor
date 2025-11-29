@@ -1,0 +1,188 @@
+@page "/requests"
+@using UniversityManagement.Shared.DTOs.Responses
+@using UniversityManagement.Shared.DTOs.Requests
+@using UniversityManagement.Domain.Enums
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" GutterBottom="true">Requests Management</MudText>
+
+    <MudTable Items="@_requests" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<RequestResponse,bool>(FilterFunc1)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">All Requests</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Student</MudTh>
+            <MudTh>Type</MudTh>
+            <MudTh>Content</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Date</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Student">@context.StudentName</MudTd>
+            <MudTd DataLabel="Type">@context.Type</MudTd>
+            <MudTd DataLabel="Content">@context.Content</MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Color="@GetStatusColor(context.Status)">@context.Status</MudChip>
+            </MudTd>
+            <MudTd DataLabel="Date">@context.CreatedAt.ToString("g")</MudTd>
+            <MudTd DataLabel="Actions">
+                @if (context.Status == RequestStatus.Pending)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.Check" Color="Color.Success" OnClick="@(() => ApproveRequest(context))" Title="Approve" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Error" OnClick="@(() => RejectRequest(context))" Title="Reject" />
+                }
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Default" OnClick="@(() => DeleteRequest(context.Id))" />
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="_rejectVisible" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">Reject Request</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string" Label="Reason" @bind-Value="_rejectionReason" Required="true" Lines="3" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CloseRejectDialog">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="ConfirmReject">Reject</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private List<RequestResponse> _requests = new();
+    private string _searchString = "";
+    private bool _rejectVisible;
+    private string _rejectionReason = "";
+    private Guid _rejectingId;
+    private DialogOptions dialogOptions = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            _requests = await Http.GetFromJsonAsync<List<RequestResponse>>("api/requests") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading data: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task ApproveRequest(RequestResponse request)
+    {
+        var updateRequest = new UpdateRequestStatusRequest
+        {
+            Status = RequestStatus.Approved
+        };
+
+        try
+        {
+            await Http.PutAsJsonAsync($"api/requests/{request.Id}/status", updateRequest);
+            Snackbar.Add("Request approved", Severity.Success);
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error approving request: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void RejectRequest(RequestResponse request)
+    {
+        _rejectingId = request.Id;
+        _rejectionReason = "";
+        _rejectVisible = true;
+    }
+
+    private void CloseRejectDialog() => _rejectVisible = false;
+
+    private async Task ConfirmReject()
+    {
+        if (string.IsNullOrWhiteSpace(_rejectionReason))
+        {
+            Snackbar.Add("Reason is required", Severity.Warning);
+            return;
+        }
+
+        var updateRequest = new UpdateRequestStatusRequest
+        {
+            Status = RequestStatus.Rejected,
+            RejectionReason = _rejectionReason
+        };
+
+        try
+        {
+            await Http.PutAsJsonAsync($"api/requests/{_rejectingId}/status", updateRequest);
+            Snackbar.Add("Request rejected", Severity.Success);
+            _rejectVisible = false;
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error rejecting request: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task DeleteRequest(Guid id)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Warning", 
+            "Deleting can not be undone!", 
+            yesText:"Delete!", cancelText:"Cancel");
+
+        if (result == true)
+        {
+            try
+            {
+                await Http.DeleteAsync($"api/requests/{id}");
+                Snackbar.Add("Request deleted", Severity.Success);
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error deleting request: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+    private bool FilterFunc1(RequestResponse element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(RequestResponse element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.StudentName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Content.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private Color GetStatusColor(RequestStatus status)
+    {
+        return status switch
+        {
+            RequestStatus.Pending => Color.Warning,
+            RequestStatus.Approved => Color.Info,
+            RequestStatus.Completed => Color.Success,
+            RequestStatus.Rejected => Color.Error,
+            _ => Color.Default
+        };
+    }
+}

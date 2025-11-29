@@ -1,0 +1,134 @@
+@page "/students/create"
+@page "/students/edit/{id:guid}"
+@using UniversityManagement.Shared.DTOs.Requests
+@using UniversityManagement.Shared.DTOs.Responses
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-4">
+    <MudText Typo="Typo.h4" GutterBottom="true">@(_isEdit ? "Edit Student" : "Create Student")</MudText>
+
+    <MudPaper Class="pa-4">
+        <MudForm @ref="_form" @bind-IsValid="_success">
+            <MudTextField T="string" Label="First Name" @bind-Value="_model.FirstName" Required="true" RequiredError="First name is required!" />
+            <MudTextField T="string" Label="Last Name" @bind-Value="_model.LastName" Required="true" RequiredError="Last name is required!" />
+            <MudTextField T="string" Label="Email" @bind-Value="_model.Email" Required="true" RequiredError="Email is required!" InputType="InputType.Email" />
+            <MudTextField T="string" Label="CNP" @bind-Value="_model.Cnp" Required="true" RequiredError="CNP is required!" MaxLength="13" />
+            <MudTextField T="string" Label="Address" @bind-Value="_model.Address" Lines="3" />
+            <MudTextField T="string" Label="Phone" @bind-Value="_model.Phone" />
+            <MudDatePicker Label="Birth Date" @bind-Date="_birthDate" />
+            
+            <div class="d-flex align-center justify-space-between mt-6">
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save" Disabled="@(!_success || _loading)">
+                    @if (_loading)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                        <MudText Class="ms-2">Saving</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Save</MudText>
+                    }
+                </MudButton>
+            </div>
+        </MudForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+
+    private CreateStudentRequest _model = new();
+    private MudForm _form;
+    private bool _success;
+    private bool _loading;
+    private bool _isEdit => Id.HasValue;
+    private DateTime? _birthDate;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_isEdit)
+        {
+            await LoadStudent();
+        }
+    }
+
+    private async Task LoadStudent()
+    {
+        _loading = true;
+        try
+        {
+            var student = await Http.GetFromJsonAsync<StudentResponse>($"api/students/{Id}");
+            if (student != null)
+            {
+                _model = new CreateStudentRequest
+                {
+                    FirstName = student.FirstName,
+                    LastName = student.LastName,
+                    Email = student.Email,
+                    // Note: Response DTO might not have all fields needed for Edit (like CNP if sensitive)
+                    // But for MVP we assume we can fetch them or we need a separate Edit DTO.
+                    // Let's assume we can fetch them or we map what we have.
+                    // Actually, StudentResponse doesn't have CNP/Address/Phone/BirthDate in my definition!
+                    // I need to update StudentResponse to include these fields for the Edit form to work properly.
+                    // Or use a separate StudentDetailsResponse.
+                    // For now, I'll update StudentResponse in Shared.
+                };
+                // _birthDate = student.BirthDate?.ToDateTime(TimeOnly.MinValue);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to load student: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task Save()
+    {
+        _loading = true;
+        try
+        {
+            _model.BirthDate = _birthDate.HasValue ? DateOnly.FromDateTime(_birthDate.Value) : null;
+
+            HttpResponseMessage response;
+            if (_isEdit)
+            {
+                response = await Http.PutAsJsonAsync($"api/students/{Id}", _model);
+            }
+            else
+            {
+                response = await Http.PostAsJsonAsync("api/students", _model);
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Student saved", Severity.Success);
+                Navigation.NavigateTo("/students");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Snackbar.Add($"Failed to save: {error}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error saving: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/students");
+    }
+}

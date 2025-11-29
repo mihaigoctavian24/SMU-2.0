@@ -1,0 +1,13 @@
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/bin/Debug/net10.0/UniversityManagement.Domain.deps.json
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/bin/Debug/net10.0/UniversityManagement.Domain.dll
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/bin/Debug/net10.0/UniversityManagement.Domain.pdb
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/obj/Debug/net10.0/UniversityManagement.Domain.csproj.AssemblyReference.cache
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/obj/Debug/net10.0/UniversityManagement.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/obj/Debug/net10.0/UniversityManagement.Domain.AssemblyInfoInputs.cache
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/obj/Debug/net10.0/UniversityManagement.Domain.AssemblyInfo.cs
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/obj/Debug/net10.0/UniversityManagement.Domain.csproj.CoreCompileInputs.cache
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/obj/Debug/net10.0/UniversityManagement.Domain.sourcelink.json
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/obj/Debug/net10.0/UniversityManagement.Domain.dll
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/obj/Debug/net10.0/refint/UniversityManagement.Domain.dll
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/obj/Debug/net10.0/UniversityManagement.Domain.pdb
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/obj/Debug/net10.0/ref/UniversityManagement.Domain.dll

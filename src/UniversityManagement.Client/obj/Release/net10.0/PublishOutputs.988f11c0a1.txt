@@ -1,0 +1,4 @@
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/bin/Release/net10.0/publish/wwwroot/index.html
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/bin/Release/net10.0/publish/UniversityManagement.Client.runtimeconfig.json
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/bin/Release/net10.0/publish/dotnet.js
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/bin/Release/net10.0/publish/web.config

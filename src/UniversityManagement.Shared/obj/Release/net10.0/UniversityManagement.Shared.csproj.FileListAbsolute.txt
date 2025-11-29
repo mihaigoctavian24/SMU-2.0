@@ -1,0 +1,16 @@
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/bin/Release/net10.0/UniversityManagement.Shared.deps.json
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/bin/Release/net10.0/UniversityManagement.Shared.dll
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/bin/Release/net10.0/UniversityManagement.Shared.pdb
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/bin/Release/net10.0/UniversityManagement.Domain.dll
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/bin/Release/net10.0/UniversityManagement.Domain.pdb
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/obj/Release/net10.0/UniversityManagement.Shared.csproj.AssemblyReference.cache
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/obj/Release/net10.0/UniversityManagement.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/obj/Release/net10.0/UniversityManagement.Shared.AssemblyInfoInputs.cache
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/obj/Release/net10.0/UniversityManagement.Shared.AssemblyInfo.cs
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/obj/Release/net10.0/UniversityManagement.Shared.csproj.CoreCompileInputs.cache
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/obj/Release/net10.0/UniversityManagement.Shared.sourcelink.json
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/obj/Release/net10.0/Universi.14712A82.Up2Date
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/obj/Release/net10.0/UniversityManagement.Shared.dll
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/obj/Release/net10.0/refint/UniversityManagement.Shared.dll
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/obj/Release/net10.0/UniversityManagement.Shared.pdb
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/obj/Release/net10.0/ref/UniversityManagement.Shared.dll

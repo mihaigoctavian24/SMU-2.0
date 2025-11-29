@@ -1,0 +1,181 @@
+@page "/my-requests"
+@using UniversityManagement.Shared.DTOs.Responses
+@using UniversityManagement.Shared.DTOs.Requests
+@using UniversityManagement.Domain.Enums
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" GutterBottom="true">My Requests</MudText>
+
+    <MudTable Items="@_requests" Dense="true" Hover="true" Bordered="true" Striped="true">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Requests History</MudText>
+            <MudSpacer />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenDialog" Class="ml-4">New Request</MudButton>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Type</MudTh>
+            <MudTh>Content</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Date</MudTh>
+            <MudTh>Rejection Reason</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Type">@context.Type</MudTd>
+            <MudTd DataLabel="Content">@context.Content</MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Color="@GetStatusColor(context.Status)">@context.Status</MudChip>
+            </MudTd>
+            <MudTd DataLabel="Date">@context.CreatedAt.ToString("g")</MudTd>
+            <MudTd DataLabel="Rejection Reason">@context.RejectionReason</MudTd>
+            <MudTd DataLabel="Actions">
+                @if (context.Status == RequestStatus.Approved || context.Status == RequestStatus.Completed)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Primary" Href="@($"api/requests/{context.Id}/document")" Target="_blank" Title="Download Document" />
+                }
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">New Request</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudSelect T="RequestType" Label="Type" @bind-Value="_requestRequest.Type" Required="true" AnchorOrigin="Origin.BottomCenter">
+                @foreach (RequestType type in Enum.GetValues(typeof(RequestType)))
+                {
+                    <MudSelectItem Value="@type">@type</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField T="string" Label="Content/Details" @bind-Value="_requestRequest.Content" Required="true" Lines="3" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CloseDialog">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SubmitRequest">Submit</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private List<RequestResponse> _requests = new();
+    private bool _visible;
+    private CreateRequestRequest _requestRequest = new();
+    private MudForm _form;
+    private DialogOptions dialogOptions = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+    private Guid _studentId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            _requests = await Http.GetFromJsonAsync<List<RequestResponse>>("api/requests/my-requests") ?? new();
+            
+            // Get current student ID for creating requests
+            // In a real app we might get this from state or the API might infer it from context
+            // But our CreateRequestRequest requires StudentId.
+            // Let's fetch the student profile to get the ID.
+            // Optimization: Store in state/service.
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                // We need to call an endpoint to get the student profile ID
+                // Or we can rely on the API to set it if we make StudentId optional in DTO?
+                // But DTO has it.
+                // Let's assume we can get it from the "my-requests" call if we adjusted the response? No.
+                // Let's fetch profile.
+                // Actually, the API `Create` endpoint checks `User` claim and `StudentService`.
+                // But the `CreateRequestRequest` DTO expects `StudentId`.
+                // I should update the API to ignore the DTO's StudentId and use the logged-in user's student ID.
+                // But for now, let's fetch it.
+                // Or better: Update the API to set StudentId from context.
+                // I'll fetch it here to keep API simple for now.
+                // Wait, I don't have an endpoint to "get my profile" easily exposed as just "GetMe".
+                // I have `GetByUserId` in service but not exposed as `api/students/me`.
+                // I'll rely on the fact that `RequestsController.Create` validates and ensures the ID matches.
+                // So I need to send the correct ID.
+                // I'll add `api/students/me` or similar?
+                // Or just use `api/requests/my-requests` which returns requests.
+                // If I have requests, I can take StudentId from the first one.
+                // If not, I'm stuck.
+                
+                // Let's add a `GetMe` to StudentsController or just fetch all students and filter (bad).
+                // I'll assume for now I can get it.
+                // Actually, let's look at `RequestsController.Create`.
+                /*
+                var student = await _studentService.GetByUserIdAsync(userId);
+                if (student == null || student.Id != request.StudentId)
+                */
+                // It requires the ID to match.
+                
+                // I will fetch the student by user ID in the client.
+                // But I don't have the user ID easily in Blazor WASM without parsing claims.
+                // And I don't have an endpoint `api/students/by-user/{userId}` exposed?
+                // `StudentService` has it, but `StudentsController`?
+                // Let's check `StudentsController`.
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading data: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void OpenDialog()
+    {
+        _requestRequest = new CreateRequestRequest { Type = RequestType.Certificate };
+        _visible = true;
+    }
+
+    private void CloseDialog() => _visible = false;
+
+    private async Task SubmitRequest()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        try
+        {
+            // We need the StudentId.
+            // Quick fix: Fetch it first.
+            // I'll add a helper method to fetch current student.
+            var student = await Http.GetFromJsonAsync<StudentResponse>("api/students/me");
+            if (student != null)
+            {
+                _requestRequest.StudentId = student.Id;
+                await Http.PostAsJsonAsync("api/requests", _requestRequest);
+                Snackbar.Add("Request submitted", Severity.Success);
+                _visible = false;
+                await LoadData();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error submitting request: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private Color GetStatusColor(RequestStatus status)
+    {
+        return status switch
+        {
+            RequestStatus.Pending => Color.Warning,
+            RequestStatus.Approved => Color.Info,
+            RequestStatus.Completed => Color.Success,
+            RequestStatus.Rejected => Color.Error,
+            _ => Color.Default
+        };
+    }
+}

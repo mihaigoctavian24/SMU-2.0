@@ -1,0 +1,186 @@
+@page "/attendance"
+@using UniversityManagement.Shared.DTOs.Responses
+@using UniversityManagement.Shared.DTOs.Requests
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" GutterBottom="true">Attendance Management</MudText>
+
+    <MudTable Items="@_attendances" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<AttendanceResponse,bool>(FilterFunc1)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Attendance Records</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenDialog" Class="ml-4">Add Record</MudButton>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Student</MudTh>
+            <MudTh>Subject</MudTh>
+            <MudTh>Date</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Student">@context.StudentName</MudTd>
+            <MudTd DataLabel="Subject">@context.Subject</MudTd>
+            <MudTd DataLabel="Date">@context.Date.ToShortDateString()</MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Color="@(context.IsPresent ? Color.Success : Color.Error)">@(context.IsPresent ? "Present" : "Absent")</MudChip>
+            </MudTd>
+            <MudTd DataLabel="Actions">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" OnClick="@(() => EditAttendance(context))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteAttendance(context.Id))" />
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">@(_isEdit ? "Edit Attendance" : "Add Attendance")</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudSelect T="Guid" Label="Student" @bind-Value="_attendanceRequest.StudentId" Required="true" AnchorOrigin="Origin.BottomCenter">
+                @foreach (var student in _students)
+                {
+                    <MudSelectItem Value="@student.Id">@student.FirstName @student.LastName</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField T="string" Label="Subject" @bind-Value="_attendanceRequest.Subject" Required="true" />
+            <MudDatePicker Label="Date" @bind-Date="_date" Required="true" />
+            <MudCheckBox T="bool" Label="Present" @bind-Value="_attendanceRequest.IsPresent" Color="Color.Success"></MudCheckBox>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CloseDialog">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveAttendance">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private List<AttendanceResponse> _attendances = new();
+    private List<StudentResponse> _students = new();
+    private string _searchString = "";
+    private bool _visible;
+    private bool _isEdit;
+    private Guid _editingId;
+    private CreateAttendanceRequest _attendanceRequest = new();
+    private MudForm _form;
+    private DateTime? _date = DateTime.Today;
+    private DialogOptions dialogOptions = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            _attendances = await Http.GetFromJsonAsync<List<AttendanceResponse>>("api/attendance") ?? new();
+            _students = await Http.GetFromJsonAsync<List<StudentResponse>>("api/students") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading data: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void OpenDialog()
+    {
+        _attendanceRequest = new CreateAttendanceRequest { Date = DateOnly.FromDateTime(DateTime.Today), IsPresent = true };
+        _date = DateTime.Today;
+        _isEdit = false;
+        _visible = true;
+    }
+
+    private void CloseDialog() => _visible = false;
+
+    private void EditAttendance(AttendanceResponse attendance)
+    {
+        _attendanceRequest = new CreateAttendanceRequest
+        {
+            StudentId = attendance.StudentId,
+            Subject = attendance.Subject,
+            Date = attendance.Date,
+            IsPresent = attendance.IsPresent
+        };
+        _date = attendance.Date.ToDateTime(TimeOnly.MinValue);
+        _editingId = attendance.Id;
+        _isEdit = true;
+        _visible = true;
+    }
+
+    private async Task SaveAttendance()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        if (_date.HasValue)
+        {
+            _attendanceRequest.Date = DateOnly.FromDateTime(_date.Value);
+        }
+
+        try
+        {
+            if (_isEdit)
+            {
+                await Http.PutAsJsonAsync($"api/attendance/{_editingId}", _attendanceRequest);
+                Snackbar.Add("Attendance updated", Severity.Success);
+            }
+            else
+            {
+                await Http.PostAsJsonAsync("api/attendance", _attendanceRequest);
+                Snackbar.Add("Attendance added", Severity.Success);
+            }
+            _visible = false;
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error saving attendance: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task DeleteAttendance(Guid id)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Warning", 
+            "Deleting can not be undone!", 
+            yesText:"Delete!", cancelText:"Cancel");
+
+        if (result == true)
+        {
+            try
+            {
+                await Http.DeleteAsync($"api/attendance/{id}");
+                Snackbar.Add("Attendance deleted", Severity.Success);
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error deleting attendance: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+    private bool FilterFunc1(AttendanceResponse element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(AttendanceResponse element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.StudentName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Subject.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

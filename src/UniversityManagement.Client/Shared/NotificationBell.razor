@@ -1,0 +1,125 @@
+@using UniversityManagement.Shared.DTOs.Responses
+@using UniversityManagement.Domain.Enums
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<MudBadge Content="_unreadCount" Color="Color.Error" Overlap="true" Visible="@(_unreadCount > 0)" Class="mx-2">
+    <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" OnClick="@ToggleOpen" />
+    <MudPopover Open="@_isOpen" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" Class="px-4 pt-4">
+        <div class="d-flex flex-column gap-2" style="min-width: 300px; max-height: 400px; overflow-y: auto;">
+            <div class="d-flex justify-content-between align-center mb-2">
+                <MudText Typo="Typo.h6">Notifications</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" Size="Size.Small" OnClick="MarkAllAsRead">Mark all read</MudButton>
+            </div>
+            
+            @if (_notifications.Any())
+            {
+                @foreach (var notification in _notifications)
+                {
+                    <MudPaper Class="pa-2 d-flex flex-column cursor-pointer hover-effect" Elevation="0" Outlined="true" @onclick="@(() => MarkAsRead(notification))">
+                        <div class="d-flex justify-content-between">
+                            <MudText Typo="Typo.subtitle2" Color="@GetColor(notification.Type)">@notification.Title</MudText>
+                            <MudText Typo="Typo.caption">@notification.CreatedAt.ToString("g")</MudText>
+                        </div>
+                        <MudText Typo="Typo.body2">@notification.Message</MudText>
+                    </MudPaper>
+                }
+            }
+            else
+            {
+                <MudText Typo="Typo.body2" Align="Align.Center" Class="py-4">No new notifications</MudText>
+            }
+
+            <MudDivider Class="my-2" />
+            <MudButton Variant="Variant.Text" FullWidth="true" OnClick="@(() => Navigation.NavigateTo("notifications"))">View All</MudButton>
+        </div>
+    </MudPopover>
+</MudBadge>
+<MudOverlay Visible="_isOpen" OnClick="ToggleOpen" DarkBackground="false" ZIndex="0" />
+
+<style>
+    .hover-effect:hover {
+        background-color: var(--mud-palette-action-hover);
+    }
+</style>
+
+@code {
+    private bool _isOpen;
+    private int _unreadCount;
+    private List<NotificationResponse> _notifications = new();
+    private System.Threading.Timer? _timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNotifications();
+        // Poll for notifications every 30 seconds
+        _timer = new System.Threading.Timer(async _ => await InvokeAsync(LoadNotifications), null, 30000, 30000);
+    }
+
+    private async Task LoadNotifications()
+    {
+        try
+        {
+            var unread = await Http.GetFromJsonAsync<List<NotificationResponse>>("api/notifications/unread");
+            if (unread != null)
+            {
+                _notifications = unread.Take(5).ToList(); // Show top 5
+                _unreadCount = unread.Count;
+                StateHasChanged();
+            }
+        }
+        catch
+        {
+            // Ignore errors during polling
+        }
+    }
+
+    private void ToggleOpen()
+    {
+        _isOpen = !_isOpen;
+    }
+
+    private async Task MarkAsRead(NotificationResponse notification)
+    {
+        try
+        {
+            await Http.PutAsync($"api/notifications/{notification.Id}/read", null);
+            await LoadNotifications();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task MarkAllAsRead()
+    {
+        try
+        {
+            await Http.PutAsync("api/notifications/read-all", null);
+            await LoadNotifications();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private Color GetColor(NotificationType type)
+    {
+        return type switch
+        {
+            NotificationType.Info => Color.Info,
+            NotificationType.Success => Color.Success,
+            NotificationType.Warning => Color.Warning,
+            NotificationType.Error => Color.Error,
+            _ => Color.Default
+        };
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}

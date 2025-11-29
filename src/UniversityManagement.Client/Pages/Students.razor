@@ -1,0 +1,115 @@
+@page "/students"
+@using UniversityManagement.Shared.DTOs.Responses
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" GutterBottom="true">Students</MudText>
+    
+    <MudTable Items="@_students" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Student List</MudText>
+            <MudSpacer />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="CreateStudent">Add Student</MudButton>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Enrollment #</MudTh>
+            <MudTh>First Name</MudTh>
+            <MudTh>Last Name</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Group</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Enrollment #">@context.EnrollmentNumber</MudTd>
+            <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+            <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Group">@context.GroupName</MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Color="@GetStatusColor(context.Status)" Size="Size.Small">@context.Status</MudChip>
+            </MudTd>
+            <MudTd DataLabel="Actions">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="@(() => EditStudent(context.Id))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" OnClick="@(() => DeleteStudent(context.Id))" />
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+@code {
+    private List<StudentResponse> _students = new();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStudents();
+    }
+
+    private async Task LoadStudents()
+    {
+        _loading = true;
+        try
+        {
+            _students = await Http.GetFromJsonAsync<List<StudentResponse>>("api/students") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to load students: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void CreateStudent()
+    {
+        Navigation.NavigateTo("/students/create");
+    }
+
+    private void EditStudent(Guid id)
+    {
+        Navigation.NavigateTo($"/students/edit/{id}");
+    }
+
+    private async Task DeleteStudent(Guid id)
+    {
+        // Confirm dialog would be better here
+        try
+        {
+            var response = await Http.DeleteAsync($"api/students/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Student deleted", Severity.Success);
+                await LoadStudents();
+            }
+            else
+            {
+                Snackbar.Add("Failed to delete student", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error deleting student: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private Color GetStatusColor(UniversityManagement.Domain.Enums.StudentStatus status)
+    {
+        return status switch
+        {
+            UniversityManagement.Domain.Enums.StudentStatus.Active => Color.Success,
+            UniversityManagement.Domain.Enums.StudentStatus.Suspended => Color.Warning,
+            UniversityManagement.Domain.Enums.StudentStatus.Expelled => Color.Error,
+            UniversityManagement.Domain.Enums.StudentStatus.Graduated => Color.Info,
+            UniversityManagement.Domain.Enums.StudentStatus.Withdrawn => Color.Default,
+            _ => Color.Default
+        };
+    }
+}

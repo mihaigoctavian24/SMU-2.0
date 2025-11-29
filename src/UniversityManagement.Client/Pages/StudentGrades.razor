@@ -1,0 +1,62 @@
+@page "/my-grades"
+@using UniversityManagement.Shared.DTOs.Responses
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" GutterBottom="true">My Grades</MudText>
+
+    @if (_loading)
+    {
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (_grades.Count == 0)
+    {
+        <MudAlert Severity="Severity.Info">No grades found.</MudAlert>
+    }
+    else
+    {
+        <MudTable Items="@_grades" Dense="true" Hover="true" Bordered="true" Striped="true">
+            <HeaderContent>
+                <MudTh>Subject</MudTh>
+                <MudTh>Value</MudTh>
+                <MudTh>Semester</MudTh>
+                <MudTh>Date</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Subject">@context.Subject</MudTd>
+                <MudTd DataLabel="Value">
+                    <MudChip T="string" Color="@GetGradeColor(context.Value)">@context.Value</MudChip>
+                </MudTd>
+                <MudTd DataLabel="Semester">@context.Semester</MudTd>
+                <MudTd DataLabel="Date">@context.Date.ToShortDateString()</MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</MudContainer>
+
+@code {
+    private List<GradeResponse> _grades = new();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _grades = await Http.GetFromJsonAsync<List<GradeResponse>>("api/grades/my-grades") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading grades: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private Color GetGradeColor(int value)
+    {
+        return value >= 5 ? Color.Success : Color.Error;
+    }
+}

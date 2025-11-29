@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/UniversityManagement.API/UniversityManagement.API.csproj" />
+    <Project Path="src/UniversityManagement.Application/UniversityManagement.Application.csproj" />
+    <Project Path="src/UniversityManagement.Client/UniversityManagement.Client.csproj" />
+    <Project Path="src/UniversityManagement.Domain/UniversityManagement.Domain.csproj" />
+    <Project Path="src/UniversityManagement.Infrastructure/UniversityManagement.Infrastructure.csproj" />
+    <Project Path="src/UniversityManagement.Shared/UniversityManagement.Shared.csproj" />
+  </Folder>
+</Solution>

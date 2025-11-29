@@ -1,0 +1,110 @@
+@page "/notifications"
+@using UniversityManagement.Shared.DTOs.Responses
+@using UniversityManagement.Domain.Enums
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <div class="d-flex justify-content-between align-center mb-4">
+        <MudText Typo="Typo.h4">Notifications</MudText>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.DoneAll" OnClick="MarkAllAsRead">Mark all as read</MudButton>
+    </div>
+
+    @if (_loading)
+    {
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (_notifications.Any())
+    {
+        <MudList T="NotificationResponse" Clickable="true">
+            @foreach (var notification in _notifications)
+            {
+                <MudListItem T="NotificationResponse" OnClick="@(() => MarkAsRead(notification))" Class="@(notification.IsRead ? "" : "mud-theme-primary-hover")">
+                    <div class="d-flex flex-column w-100">
+                        <div class="d-flex justify-content-between">
+                            <MudText Typo="Typo.subtitle1" Color="@GetColor(notification.Type)">
+                                @if (!notification.IsRead) { <MudIcon Icon="@Icons.Material.Filled.Circle" Size="Size.Small" Color="Color.Primary" Class="mr-2" /> }
+                                @notification.Title
+                            </MudText>
+                            <MudText Typo="Typo.caption">@notification.CreatedAt.ToString("g")</MudText>
+                        </div>
+                        <MudText Typo="Typo.body2">@notification.Message</MudText>
+                    </div>
+                </MudListItem>
+                <MudDivider />
+            }
+        </MudList>
+    }
+    else
+    {
+        <MudText Typo="Typo.body1" Align="Align.Center">No notifications found.</MudText>
+    }
+</MudContainer>
+
+@code {
+    private List<NotificationResponse> _notifications = new();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _loading = true;
+        try
+        {
+            _notifications = await Http.GetFromJsonAsync<List<NotificationResponse>>("api/notifications") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading notifications: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task MarkAsRead(NotificationResponse notification)
+    {
+        if (notification.IsRead) return;
+
+        try
+        {
+            await Http.PutAsync($"api/notifications/{notification.Id}/read", null);
+            notification.IsRead = true;
+            // Ideally refresh the bell too, maybe via an event or state
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task MarkAllAsRead()
+    {
+        try
+        {
+            await Http.PutAsync("api/notifications/read-all", null);
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private Color GetColor(NotificationType type)
+    {
+        return type switch
+        {
+            NotificationType.Info => Color.Info,
+            NotificationType.Success => Color.Success,
+            NotificationType.Warning => Color.Warning,
+            NotificationType.Error => Color.Error,
+            _ => Color.Default
+        };
+    }
+}

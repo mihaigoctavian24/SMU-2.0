@@ -1,0 +1,66 @@
+@page "/login"
+@using Supabase.Gotrue
+@inject Supabase.Client Supabase
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5" Align="Align.Center">Login</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTextField @bind-Value="_email" Label="Email" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-3" />
+            <MudTextField @bind-Value="_password" Label="Password" Variant="Variant.Outlined" Margin="Margin.Dense" InputType="InputType.Password" />
+        </MudCardContent>
+        <MudCardActions Class="d-flex justify-center pb-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SignIn" Disabled="_loading">
+                @if (_loading)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                    <MudText Class="ms-2">Loading</MudText>
+                }
+                else
+                {
+                    <MudText>Sign In</MudText>
+                }
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private string _email = "";
+    private string _password = "";
+    private bool _loading = false;
+
+    private async Task SignIn()
+    {
+        if (string.IsNullOrWhiteSpace(_email) || string.IsNullOrWhiteSpace(_password))
+        {
+            Snackbar.Add("Please enter email and password", Severity.Warning);
+            return;
+        }
+
+        _loading = true;
+        try
+        {
+            var session = await Supabase.Auth.SignIn(_email, _password);
+            if (session != null)
+            {
+                Snackbar.Add("Login successful", Severity.Success);
+                Navigation.NavigateTo("/");
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Login failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

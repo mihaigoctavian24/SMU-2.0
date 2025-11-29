@@ -1,0 +1,93 @@
+@page "/my-attendance"
+@using UniversityManagement.Shared.DTOs.Responses
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" GutterBottom="true">My Attendance</MudText>
+
+    @if (_loading)
+    {
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (_attendances.Count == 0)
+    {
+        <MudAlert Severity="Severity.Info">No attendance records found.</MudAlert>
+    }
+    else
+    {
+        <MudGrid Class="mb-4">
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Class="pa-4 d-flex flex-column align-center justify-center mud-width-full">
+                    <MudText Typo="Typo.h6">Presence Rate</MudText>
+                    <MudText Typo="Typo.h3" Color="@GetRateColor(_presenceRate)">@_presenceRate.ToString("F1")%</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Class="pa-4 d-flex flex-column align-center justify-center mud-width-full">
+                    <MudText Typo="Typo.h6">Total Classes</MudText>
+                    <MudText Typo="Typo.h3">@_attendances.Count</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Class="pa-4 d-flex flex-column align-center justify-center mud-width-full">
+                    <MudText Typo="Typo.h6">Present</MudText>
+                    <MudText Typo="Typo.h3" Color="Color.Success">@_attendances.Count(a => a.IsPresent)</MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        <MudTable Items="@_attendances" Dense="true" Hover="true" Bordered="true" Striped="true">
+            <HeaderContent>
+                <MudTh>Subject</MudTh>
+                <MudTh>Date</MudTh>
+                <MudTh>Status</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Subject">@context.Subject</MudTd>
+                <MudTd DataLabel="Date">@context.Date.ToShortDateString()</MudTd>
+                <MudTd DataLabel="Status">
+                    <MudChip T="string" Color="@(context.IsPresent ? Color.Success : Color.Error)">@(context.IsPresent ? "Present" : "Absent")</MudChip>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</MudContainer>
+
+@code {
+    private List<AttendanceResponse> _attendances = new();
+    private bool _loading = true;
+    private double _presenceRate;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _attendances = await Http.GetFromJsonAsync<List<AttendanceResponse>>("api/attendance/my-attendance") ?? new();
+            CalculateStats();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading attendance: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void CalculateStats()
+    {
+        if (_attendances.Count > 0)
+        {
+            _presenceRate = (double)_attendances.Count(a => a.IsPresent) / _attendances.Count * 100;
+        }
+    }
+
+    private Color GetRateColor(double rate)
+    {
+        if (rate >= 80) return Color.Success;
+        if (rate >= 50) return Color.Warning;
+        return Color.Error;
+    }
+}

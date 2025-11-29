@@ -1,0 +1,188 @@
+@page "/grades"
+@using UniversityManagement.Shared.DTOs.Responses
+@using UniversityManagement.Shared.DTOs.Requests
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" GutterBottom="true">Grades Catalog</MudText>
+
+    <MudTable Items="@_grades" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<GradeResponse,bool>(FilterFunc1)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Grades</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenDialog" Class="ml-4">Add Grade</MudButton>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Student</MudTh>
+            <MudTh>Subject</MudTh>
+            <MudTh>Value</MudTh>
+            <MudTh>Semester</MudTh>
+            <MudTh>Date</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Student">@context.StudentName</MudTd>
+            <MudTd DataLabel="Subject">@context.Subject</MudTd>
+            <MudTd DataLabel="Value">@context.Value</MudTd>
+            <MudTd DataLabel="Semester">@context.Semester</MudTd>
+            <MudTd DataLabel="Date">@context.Date.ToShortDateString()</MudTd>
+            <MudTd DataLabel="Actions">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" OnClick="@(() => EditGrade(context))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteGrade(context.Id))" />
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="_visible" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">@(_isEdit ? "Edit Grade" : "Add Grade")</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudSelect T="Guid" Label="Student" @bind-Value="_gradeRequest.StudentId" Required="true" AnchorOrigin="Origin.BottomCenter">
+                @foreach (var student in _students)
+                {
+                    <MudSelectItem Value="@student.Id">@student.FirstName @student.LastName</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField T="string" Label="Subject" @bind-Value="_gradeRequest.Subject" Required="true" />
+            <MudNumericField T="int" Label="Value" @bind-Value="_gradeRequest.Value" Required="true" Min="1" Max="10" />
+            <MudNumericField T="int" Label="Semester" @bind-Value="_gradeRequest.Semester" Required="true" Min="1" Max="2" />
+            <MudDatePicker Label="Date" @bind-Date="_date" Required="true" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CloseDialog">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveGrade">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private List<GradeResponse> _grades = new();
+    private List<StudentResponse> _students = new();
+    private string _searchString = "";
+    private bool _visible;
+    private bool _isEdit;
+    private Guid _editingId;
+    private CreateGradeRequest _gradeRequest = new();
+    private MudForm _form;
+    private DateTime? _date = DateTime.Today;
+    private DialogOptions dialogOptions = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            _grades = await Http.GetFromJsonAsync<List<GradeResponse>>("api/grades") ?? new();
+            _students = await Http.GetFromJsonAsync<List<StudentResponse>>("api/students") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading data: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void OpenDialog()
+    {
+        _gradeRequest = new CreateGradeRequest { Date = DateOnly.FromDateTime(DateTime.Today) };
+        _date = DateTime.Today;
+        _isEdit = false;
+        _visible = true;
+    }
+
+    private void CloseDialog() => _visible = false;
+
+    private void EditGrade(GradeResponse grade)
+    {
+        _gradeRequest = new CreateGradeRequest
+        {
+            StudentId = grade.StudentId,
+            Subject = grade.Subject,
+            Value = grade.Value,
+            Semester = grade.Semester,
+            Date = grade.Date
+        };
+        _date = grade.Date.ToDateTime(TimeOnly.MinValue);
+        _editingId = grade.Id;
+        _isEdit = true;
+        _visible = true;
+    }
+
+    private async Task SaveGrade()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        if (_date.HasValue)
+        {
+            _gradeRequest.Date = DateOnly.FromDateTime(_date.Value);
+        }
+
+        try
+        {
+            if (_isEdit)
+            {
+                await Http.PutAsJsonAsync($"api/grades/{_editingId}", _gradeRequest);
+                Snackbar.Add("Grade updated", Severity.Success);
+            }
+            else
+            {
+                await Http.PostAsJsonAsync("api/grades", _gradeRequest);
+                Snackbar.Add("Grade added", Severity.Success);
+            }
+            _visible = false;
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error saving grade: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task DeleteGrade(Guid id)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Warning", 
+            "Deleting can not be undone!", 
+            yesText:"Delete!", cancelText:"Cancel");
+
+        if (result == true)
+        {
+            try
+            {
+                await Http.DeleteAsync($"api/grades/{id}");
+                Snackbar.Add("Grade deleted", Severity.Success);
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error deleting grade: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+    private bool FilterFunc1(GradeResponse element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(GradeResponse element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.StudentName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Subject.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}
