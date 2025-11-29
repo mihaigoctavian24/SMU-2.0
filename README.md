@@ -178,6 +178,59 @@ UniversityManagement/
 
 ## 📚 Documentation
 
+This folder contains all the official documentation for the University Management System project.
+
+## Documentation Files
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) - System architecture documentation
+- [CHANGELOG.md](CHANGELOG.md) - Version history and changes
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) - Code of conduct for contributors
+- [LICENSE](LICENSE) - Project license information
+- [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) - Detailed project structure
+- [SECURITY.md](SECURITY.md) - Security policies and procedures
+
+## Templates and Configuration
+
+- [PULL_REQUEST_TEMPLATE.md](PULL_REQUEST_TEMPLATE.md) - Template for pull requests
+- [bug_report.md](bug_report.md) - Template for bug reports
+- [feature_request.md](feature_request.md) - Template for feature requests
+- [ci.yml](ci.yml) - CI/CD configuration
+- [editorconfig](editorconfig) - Editor configuration
+- [env.example](env.example) - Example environment configuration
+
+## Development Documentation
+
+Development-related documentation is stored in the `development` folder which is excluded from version control. This includes:
+- Implementation plans
+- Progress tracking
+- Analysis summaries
+- Requirements documents
+
+For development documentation, please refer to the `development` folder in the project root.
+
+```
+├── 📂 src/
+│   ├── 📂 UniversityManagement.API/          # ASP.NET Core Web API
+│   ├── 📂 UniversityManagement.Application/  # Business Logic & Services
+│   ├── 📂 UniversityManagement.Domain/       # Entities & Interfaces
+│   ├── 📂 UniversityManagement.Infrastructure/ # Data Access & External Services
+│   ├── 📂 UniversityManagement.Shared/       # Shared Utilities
+│   └── 📂 UniversityManagement.Client/       # Blazor WASM Frontend
+├── 📂 tests/
+│   ├── 📂 UnitTests/
+│   ├── 📂 IntegrationTests/
+│   └── 📂 E2ETests/
+├── 📂 docs/                                   # Documentation
+├── 📂 scripts/                                # DB Scripts & Utilities
+└── 📂 docker/                                 # Docker Configuration
+```
+
+👉 Vezi [PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md) pentru detalii complete.
+
+---
+
+## 📚 Documentation
+
 | Document | Descriere |
 |----------|-----------|
 | [📐 ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arhitectura sistemului |
@@ -186,6 +239,12 @@ UniversityManagement/
 | [🗄️ DATABASE.md](docs/DATABASE.md) | Schema bazei de date |
 | [🚀 DEPLOYMENT.md](docs/DEPLOYMENT.md) | Ghid de deployment |
 | [🧪 TESTING.md](docs/TESTING.md) | Strategie de testare |
+
+For development documentation (implementation plans, progress tracking, etc.), please see the `development` folder which contains:
+- [📋 IMPLEMENTATION_PLAN.md](development/IMPLEMENTATION_PLAN.md) - Plan detaliat de implementare
+- [📊 PROGRESS_TRACKING.md](development/PROGRESS_TRACKING.md) - Urmărirea progresului implementării
+- [📝 ANALYSIS_SUMMARY.md](development/ANALYSIS_SUMMARY.md) - Rezumatul analizei sistemului
+- [📖 IMPLEMENTATION_GUIDE.md](development/IMPLEMENTATION_GUIDE.md) - Ghid pentru utilizarea documentației de implementare
 
 ---
 
