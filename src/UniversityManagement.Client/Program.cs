@@ -13,10 +13,10 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// Load configuration
+// Load configuration from environment variables or appsettings
 var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5090";
-var supabaseUrl = "https://wcmliinmbntmesfzxfmx.supabase.co";
-var supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjbWxpaW5tYm50bWVzZnp4Zm14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2OTIyMDIsImV4cCI6MjA3OTI2ODIwMn0.XO6R5htHxN2TEnfOZddrYeqdJ_ANaItr57vDcoC2iLY";
+var supabaseUrl = builder.Configuration["Supabase:Url"] ?? "https://wcmliinmbntmesfzxfmx.supabase.co";
+var supabaseKey = builder.Configuration["Supabase:Key"] ?? "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjbWxpaW5tYm50bWVzZnp4Zm14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2OTIyMDIsImV4cCI6MjA3OTI2ODIwMn0.XO6R5htHxN2TEnfOZddrYeqdJ_ANaItr57vDcoC2iLY";
 
 // Auth Handler
 builder.Services.AddTransient<CustomAuthorizationMessageHandler>();

@@ -33,36 +33,19 @@ builder.Services.AddScoped<Supabase.Client>(sp =>
         AutoConnectRealtime = true
     };
     return new Supabase.Client(
-        builder.Configuration["Supabase:Url"],
-        builder.Configuration["Supabase:Key"],
+        builder.Configuration["Supabase:Url"] ?? throw new InvalidOperationException("Supabase URL is required"),
+        builder.Configuration["Supabase:Key"] ?? throw new InvalidOperationException("Supabase Key is required"),
         options
     );
 });
 
-// Services
-builder.Services.AddScoped<ISupabaseAuthService, SupabaseAuthService>();
+// Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
-builder.Services.AddScoped<IStudentService, StudentService>();
-builder.Services.AddScoped<IGradeRepository, GradeRepository>();
-builder.Services.AddScoped<IGradeService, GradeService>();
-builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
-builder.Services.AddScoped<IAttendanceService, AttendanceService>();
-builder.Services.AddScoped<IRequestRepository, RequestRepository>();
-builder.Services.AddScoped<IRequestService, RequestService>();
-builder.Services.AddScoped<IPdfGenerationService, PdfGenerationService>();
-builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-builder.Services.AddScoped<INotificationService, NotificationService>();
 
-// Academic Structure Services
-builder.Services.AddScoped<IFacultyRepository, FacultyRepository>();
-builder.Services.AddScoped<IFacultyService, FacultyService>();
-builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
-builder.Services.AddScoped<IProgramService, ProgramService>();
-builder.Services.AddScoped<ISeriesRepository, SeriesRepository>();
-builder.Services.AddScoped<ISeriesService, SeriesService>();
-builder.Services.AddScoped<IGroupRepository, GroupRepository>();
-builder.Services.AddScoped<IGroupService, GroupService>();
+// Services
+builder.Services.AddScoped<ISupabaseAuthService, SupabaseAuthService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
 
 // Validators
 builder.Services.AddScoped<IValidator<CreateStudentRequest>, CreateStudentValidator>();
@@ -84,7 +67,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = "authenticated",
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Supabase:Key"] ?? ""))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Supabase:ServiceKey"] ?? ""))
         };
     });
 
