@@ -42,7 +42,16 @@ public class StudentService : IStudentService
         // For MVP, we might set a default or require it in request (but request doesn't have it).
         // Let's assume a default password for now or generate one.
         var defaultPassword = "ChangeMe123!"; 
-        var authIdString = await _authService.SignUpAsync(request.Email, defaultPassword);
+        
+        var signUpRequest = new UniversityManagement.Shared.DTOs.Requests.SignUpRequest
+        {
+            Email = request.Email,
+            Password = defaultPassword,
+            ConfirmPassword = defaultPassword,
+            Role = "student"
+        };
+        
+        var authResponse = await _authService.SignUpAsync(signUpRequest);
         
         // 2. Create Student Entity
         var student = new Student
@@ -94,7 +103,7 @@ public class StudentService : IStudentService
         // Supabase client might handle deep inserts?
         // Let's try deep insert if supported, or sequential.
         
-        var authId = Guid.Parse(authIdString);
+        var authId = authResponse.User.SupabaseAuthId;
         
         student.User = new User
         {

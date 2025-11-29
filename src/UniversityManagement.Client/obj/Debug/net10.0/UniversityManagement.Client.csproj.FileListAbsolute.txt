@@ -1266,3 +1266,16 @@
 /Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/obj/Debug/net10.0/compressed/lza5a0l9ea-{0}-d76xwokqmx-d76xwokqmx.gz
 /Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/obj/Debug/net10.0/compressed/rnbh3okc55-{0}-4uqrg3t0d9-4uqrg3t0d9.gz
 /Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/obj/Debug/net10.0/compressed/exiiwguave-{0}-yp76xf01te-yp76xf01te.gz
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/EmbeddedAttribute.cs
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/ValidatableTypeAttribute.cs
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/UniversityManagement.Client.dll
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/refint/UniversityManagement.Client.dll
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/UniversityManagement.Client.pdb
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/UniversityManagement.Client.csproj.AssemblyReference.cache
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/rpswa.dswa.cache.json
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/UniversityManagement.Client.GeneratedMSBuildEditorConfig.editorconfig
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/UniversityManagement.Client.AssemblyInfoInputs.cache
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/UniversityManagement.Client.AssemblyInfo.cs
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/UniversityManagement.Client.csproj.CoreCompileInputs.cache
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/UniversityManagement.Client.MvcApplicationPartsAssemblyInfo.cache
+/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/obj/Debug/net10.0/UniversityManagement.Client.sourcelink.json

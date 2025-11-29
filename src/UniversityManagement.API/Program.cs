@@ -8,11 +8,19 @@ using UniversityManagement.Application.Services;
 using UniversityManagement.Application.Validators;
 using UniversityManagement.Infrastructure.Repositories;
 using UniversityManagement.Infrastructure.Services;
+using UniversityManagement.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    // Add global exception filter
+    options.Filters.Add<GlobalExceptionFilter>();
+    // Add validation filter
+    options.Filters.Add<ValidationFilter>();
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -33,6 +41,7 @@ builder.Services.AddScoped<Supabase.Client>(sp =>
 
 // Services
 builder.Services.AddScoped<ISupabaseAuthService, SupabaseAuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IGradeRepository, GradeRepository>();
@@ -45,8 +54,21 @@ builder.Services.AddScoped<IPdfGenerationService, PdfGenerationService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
+// Academic Structure Services
+builder.Services.AddScoped<IFacultyRepository, FacultyRepository>();
+builder.Services.AddScoped<IFacultyService, FacultyService>();
+builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
+builder.Services.AddScoped<IProgramService, ProgramService>();
+builder.Services.AddScoped<ISeriesRepository, SeriesRepository>();
+builder.Services.AddScoped<ISeriesService, SeriesService>();
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IGroupService, GroupService>();
+
 // Validators
 builder.Services.AddScoped<IValidator<CreateStudentRequest>, CreateStudentValidator>();
+builder.Services.AddScoped<IValidator<SignInRequest>, SignInRequestValidator>();
+builder.Services.AddScoped<IValidator<SignUpRequest>, SignUpRequestValidator>();
+builder.Services.AddScoped<IValidator<ChangePasswordRequest>, ChangePasswordRequestValidator>();
 
 // Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

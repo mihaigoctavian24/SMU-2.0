@@ -20,89 +20,89 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = browser
 build_property.RootNamespace = UniversityManagement.Client
 build_property.RootNamespace = UniversityManagement.Client
-build_property.ProjectDir = /Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/
+build_property.ProjectDir = /Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = false
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = /Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client
+build_property.MSBuildProjectDirectory = /Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/App.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/AdminRequests.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/AdminRequests.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW5SZXF1ZXN0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/Attendance.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/Attendance.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQXR0ZW5kYW5jZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/Counter.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/Counter.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ291bnRlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/Grades.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/Grades.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvR3JhZGVzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/Home.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/Login.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/NotFound.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/NotFound.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTm90Rm91bmQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/NotificationList.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/NotificationList.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTm90aWZpY2F0aW9uTGlzdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/StudentAttendance.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/StudentAttendance.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU3R1ZGVudEF0dGVuZGFuY2UucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/StudentForm.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/StudentForm.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU3R1ZGVudEZvcm0ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/StudentGrades.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/StudentGrades.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU3R1ZGVudEdyYWRlcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/StudentRequests.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/StudentRequests.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU3R1ZGVudFJlcXVlc3RzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/Students.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/Students.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU3R1ZGVudHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/Weather.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Pages/Weather.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvV2VhdGhlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Shared/NotificationBell.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Shared/NotificationBell.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL05vdGlmaWNhdGlvbkJlbGwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/_Imports.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Layout/MainLayout.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Layout/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L01haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-uc71hbuwsd
 
-[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Layout/NavMenu.razor]
+[/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Client/Layout/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L05hdk1lbnUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-zjepzq8334
