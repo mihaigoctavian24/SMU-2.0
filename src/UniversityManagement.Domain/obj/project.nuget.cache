@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "wwDRiDoy2jY=",
+  "dgSpecHash": "z3a3MxUjGUA=",
   "success": true,
-  "projectFilePath": "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj",
+  "projectFilePath": "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj",
   "expectedPackageFiles": [
     "/Users/octavianmihai/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.0/microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
     "/Users/octavianmihai/.nuget/packages/microsoft.extensions.logging.abstractions/8.0.0/microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",

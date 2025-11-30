@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj": {}
+    "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj": {}
   },
   "projects": {
-    "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj": {
+    "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj",
+        "projectUniqueName": "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj",
         "projectName": "UniversityManagement.Domain",
-        "projectPath": "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj",
+        "projectPath": "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj",
         "packagesPath": "/Users/octavianmihai/.nuget/packages/",
-        "outputPath": "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Domain/obj/",
+        "outputPath": "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/octavianmihai/.nuget/NuGet/NuGet.Config"

@@ -35,6 +35,50 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Components/Analytics/AtRiskStudentsTable.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BbmFseXRpY3MvQXRSaXNrU3R1ZGVudHNUYWJsZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Components/Analytics/AttendanceDonutChart.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BbmFseXRpY3MvQXR0ZW5kYW5jZURvbnV0Q2hhcnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Components/Analytics/CoursePerformanceTable.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BbmFseXRpY3MvQ291cnNlUGVyZm9ybWFuY2VUYWJsZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Components/Analytics/CreditProgressBar.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BbmFseXRpY3MvQ3JlZGl0UHJvZ3Jlc3NCYXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Components/Analytics/ExportButton.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BbmFseXRpY3MvRXhwb3J0QnV0dG9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Components/Analytics/FacultyComparisonChart.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BbmFseXRpY3MvRmFjdWx0eUNvbXBhcmlzb25DaGFydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Components/Analytics/GpaTrendChart.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BbmFseXRpY3MvR3BhVHJlbmRDaGFydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Components/Analytics/GradeDistributionChart.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BbmFseXRpY3MvR3JhZGVEaXN0cmlidXRpb25DaGFydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Components/Analytics/KpiCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BbmFseXRpY3MvS3BpQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Components/Analytics/PendingTasksCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BbmFseXRpY3MvUGVuZGluZ1Rhc2tzQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Components/Analytics/ProgramComparisonChart.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BbmFseXRpY3MvUHJvZ3JhbUNvbXBhcmlzb25DaGFydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/AdminRequests.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW5SZXF1ZXN0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -45,6 +89,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/Counter.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/DeanDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRGVhbkRhc2hib2FyZC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/Grades.razor]
@@ -67,8 +115,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTm90aWZpY2F0aW9uTGlzdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/ProfessorDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZmVzc29yRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/RectorDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUmVjdG9yRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/StudentAttendance.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU3R1ZGVudEF0dGVuZGFuY2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/StudentDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU3R1ZGVudERhc2hib2FyZC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/Pages/StudentForm.razor]

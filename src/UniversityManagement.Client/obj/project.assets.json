@@ -2,6 +2,29 @@
   "version": 3,
   "targets": {
     "net10.0": {
+      "Blazor-ApexCharts/2.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "6.0.3",
+          "Microsoft.AspNetCore.Components.Web": "6.0.3"
+        },
+        "compile": {
+          "lib/net6.0/Blazor-ApexCharts.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Blazor-ApexCharts.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/Blazor-ApexCharts.props": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/Blazor-ApexCharts.props": {}
+        }
+      },
       "Fluxor/6.9.0": {
         "type": "package",
         "dependencies": {
@@ -188,6 +211,21 @@
           "lib/net10.0/Microsoft.AspNetCore.Metadata.dll": {
             "related": ".xml"
           }
+        }
+      },
+      "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.100": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/Microsoft.DotNet.HotReload.WebAssembly.Browser.dll": {}
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.DotNet.HotReload.WebAssembly.Browser.dll": {}
+        },
+        "build": {
+          "buildTransitive/Microsoft.DotNet.HotReload.WebAssembly.Browser.props": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/Microsoft.DotNet.HotReload.WebAssembly.Browser.props": {}
         }
       },
       "Microsoft.Extensions.Configuration/10.0.0": {
@@ -975,6 +1013,29 @@
       }
     },
     "net10.0/browser-wasm": {
+      "Blazor-ApexCharts/2.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "6.0.3",
+          "Microsoft.AspNetCore.Components.Web": "6.0.3"
+        },
+        "compile": {
+          "lib/net6.0/Blazor-ApexCharts.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Blazor-ApexCharts.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/Blazor-ApexCharts.props": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/Blazor-ApexCharts.props": {}
+        }
+      },
       "Fluxor/6.9.0": {
         "type": "package",
         "dependencies": {
@@ -1161,6 +1222,21 @@
           "lib/net10.0/Microsoft.AspNetCore.Metadata.dll": {
             "related": ".xml"
           }
+        }
+      },
+      "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.100": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/Microsoft.DotNet.HotReload.WebAssembly.Browser.dll": {}
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.DotNet.HotReload.WebAssembly.Browser.dll": {}
+        },
+        "build": {
+          "buildTransitive/Microsoft.DotNet.HotReload.WebAssembly.Browser.props": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/Microsoft.DotNet.HotReload.WebAssembly.Browser.props": {}
         }
       },
       "Microsoft.Extensions.Configuration/10.0.0": {
@@ -1949,6 +2025,29 @@
     }
   },
   "libraries": {
+    "Blazor-ApexCharts/2.0.0": {
+      "sha512": "XZmdLbKMHyLTa8cRVogLYKLUJx76ImSHDCgMhq84eXnq9/BbhEvFtwNKuwy47b/+k/6JJFOKgOSiIZGoxWT3HQ==",
+      "type": "package",
+      "path": "blazor-apexcharts/2.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "README.md",
+        "apexchart_logo.png",
+        "blazor-apexcharts.2.0.0.nupkg.sha512",
+        "blazor-apexcharts.nuspec",
+        "build/Blazor-ApexCharts.props",
+        "build/Microsoft.AspNetCore.StaticWebAssets.props",
+        "buildMultiTargeting/Blazor-ApexCharts.props",
+        "buildTransitive/Blazor-ApexCharts.props",
+        "lib/net6.0/Blazor-ApexCharts.dll",
+        "lib/net6.0/Blazor-ApexCharts.xml",
+        "staticwebassets/css/apexcharts.css",
+        "staticwebassets/js/apexcharts.esm.js",
+        "staticwebassets/js/blazor-apexcharts.js"
+      ]
+    },
     "Fluxor/6.9.0": {
       "sha512": "yLULcGjsqVaPBujGKyMVdm1+VXOR5mtV+nxpZ1jZATSbNfUebLIJJAXQL3TGFqx9I9SALqD/ADOUFWTBCkQRyg==",
       "type": "package",
@@ -2319,6 +2418,25 @@
         "lib/netstandard2.0/Microsoft.AspNetCore.Metadata.xml",
         "microsoft.aspnetcore.metadata.10.0.0.nupkg.sha512",
         "microsoft.aspnetcore.metadata.nuspec"
+      ]
+    },
+    "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.100": {
+      "sha512": "bTCi3TK6L54rXu7pA0duoG6/OFt//LI1tK+oPD3HTrT4ghzGi5Jgn52X8xeFGpqadSIGf5JgIxRV/uvKXNP+ig==",
+      "type": "package",
+      "path": "microsoft.dotnet.hotreload.webassembly.browser/10.0.100",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+        "build/Microsoft.AspNetCore.StaticWebAssets.props",
+        "build/Microsoft.DotNet.HotReload.WebAssembly.Browser.props",
+        "buildMultiTargeting/Microsoft.DotNet.HotReload.WebAssembly.Browser.props",
+        "buildTransitive/Microsoft.DotNet.HotReload.WebAssembly.Browser.props",
+        "lib/net10.0/Microsoft.DotNet.HotReload.WebAssembly.Browser.dll",
+        "microsoft.dotnet.hotreload.webassembly.browser.10.0.100.nupkg.sha512",
+        "microsoft.dotnet.hotreload.webassembly.browser.nuspec",
+        "staticwebassets/Microsoft.DotNet.HotReload.WebAssembly.Browser.99zm1jdh75.lib.module.js"
       ]
     },
     "Microsoft.Extensions.Configuration/10.0.0": {
@@ -3472,12 +3590,14 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
+      "Blazor-ApexCharts >= 2.0.0",
       "Fluxor.Blazor.Web >= 6.9.0",
       "Fluxor.Blazor.Web.ReduxDevTools >= 6.9.0",
       "Microsoft.AspNetCore.App.Internal.Assets >= 10.0.0",
       "Microsoft.AspNetCore.Components.Authorization >= 10.0.0",
       "Microsoft.AspNetCore.Components.WebAssembly >= 10.0.0",
       "Microsoft.AspNetCore.Components.WebAssembly.DevServer >= 10.0.0",
+      "Microsoft.DotNet.HotReload.WebAssembly.Browser >= 10.0.100",
       "Microsoft.NET.ILLink.Tasks >= 10.0.0",
       "Microsoft.NET.Sdk.WebAssembly.Pack >= 10.0.0",
       "MudBlazor >= 8.15.0",
@@ -3532,6 +3652,10 @@
       "net10.0": {
         "targetAlias": "net10.0",
         "dependencies": {
+          "Blazor-ApexCharts": {
+            "target": "Package",
+            "version": "[2.0.0, )"
+          },
           "Fluxor.Blazor.Web": {
             "target": "Package",
             "version": "[6.9.0, )"
@@ -3558,6 +3682,11 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[10.0.0, )"
+          },
+          "Microsoft.DotNet.HotReload.WebAssembly.Browser": {
+            "target": "Package",
+            "version": "[10.0.100, )",
+            "autoReferenced": true
           },
           "Microsoft.NET.ILLink.Tasks": {
             "suppressParent": "All",

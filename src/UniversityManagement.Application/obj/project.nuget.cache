@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Ih+HjsH6e2o=",
+  "dgSpecHash": "NKaMBalWxT0=",
   "success": true,
-  "projectFilePath": "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Application/UniversityManagement.Application.csproj",
+  "projectFilePath": "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Application/UniversityManagement.Application.csproj",
   "expectedPackageFiles": [
     "/Users/octavianmihai/.nuget/packages/fluentvalidation/12.1.0/fluentvalidation.12.1.0.nupkg.sha512",
     "/Users/octavianmihai/.nuget/packages/fluentvalidation.dependencyinjectionextensions/12.1.0/fluentvalidation.dependencyinjectionextensions.12.1.0.nupkg.sha512",

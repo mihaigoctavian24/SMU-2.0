@@ -928,11 +928,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Application/UniversityManagement.Application.csproj",
+      "projectUniqueName": "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Application/UniversityManagement.Application.csproj",
       "projectName": "UniversityManagement.Application",
-      "projectPath": "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Application/UniversityManagement.Application.csproj",
+      "projectPath": "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Application/UniversityManagement.Application.csproj",
       "packagesPath": "/Users/octavianmihai/.nuget/packages/",
-      "outputPath": "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Application/obj/",
+      "outputPath": "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Application/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/octavianmihai/.nuget/NuGet/NuGet.Config"
@@ -947,11 +947,11 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj": {
-              "projectPath": "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj"
+            "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj": {
+              "projectPath": "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Domain/UniversityManagement.Domain.csproj"
             },
-            "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Shared/UniversityManagement.Shared.csproj": {
-              "projectPath": "/Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.Shared/UniversityManagement.Shared.csproj"
+            "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/UniversityManagement.Shared.csproj": {
+              "projectPath": "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Shared/UniversityManagement.Shared.csproj"
             }
           }
         }

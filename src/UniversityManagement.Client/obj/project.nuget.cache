@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "HILCE2R0otY=",
+  "dgSpecHash": "mEIEDsnRdps=",
   "success": true,
   "projectFilePath": "/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.Client/UniversityManagement.Client.csproj",
   "expectedPackageFiles": [
+    "/Users/octavianmihai/.nuget/packages/blazor-apexcharts/2.0.0/blazor-apexcharts.2.0.0.nupkg.sha512",
     "/Users/octavianmihai/.nuget/packages/fluxor/6.9.0/fluxor.6.9.0.nupkg.sha512",
     "/Users/octavianmihai/.nuget/packages/fluxor.blazor.web/6.9.0/fluxor.blazor.web.6.9.0.nupkg.sha512",
     "/Users/octavianmihai/.nuget/packages/fluxor.blazor.web.reduxdevtools/6.9.0/fluxor.blazor.web.reduxdevtools.6.9.0.nupkg.sha512",
@@ -17,6 +18,7 @@
     "/Users/octavianmihai/.nuget/packages/microsoft.aspnetcore.components.webassembly/10.0.0/microsoft.aspnetcore.components.webassembly.10.0.0.nupkg.sha512",
     "/Users/octavianmihai/.nuget/packages/microsoft.aspnetcore.components.webassembly.devserver/10.0.0/microsoft.aspnetcore.components.webassembly.devserver.10.0.0.nupkg.sha512",
     "/Users/octavianmihai/.nuget/packages/microsoft.aspnetcore.metadata/10.0.0/microsoft.aspnetcore.metadata.10.0.0.nupkg.sha512",
+    "/Users/octavianmihai/.nuget/packages/microsoft.dotnet.hotreload.webassembly.browser/10.0.100/microsoft.dotnet.hotreload.webassembly.browser.10.0.100.nupkg.sha512",
     "/Users/octavianmihai/.nuget/packages/microsoft.extensions.configuration/10.0.0/microsoft.extensions.configuration.10.0.0.nupkg.sha512",
     "/Users/octavianmihai/.nuget/packages/microsoft.extensions.configuration.abstractions/10.0.0/microsoft.extensions.configuration.abstractions.10.0.0.nupkg.sha512",
     "/Users/octavianmihai/.nuget/packages/microsoft.extensions.configuration.binder/10.0.0/microsoft.extensions.configuration.binder.10.0.0.nupkg.sha512",

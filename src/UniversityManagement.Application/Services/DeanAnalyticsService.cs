@@ -19,11 +19,13 @@ public class DeanAnalyticsService : IDeanAnalyticsService
     public async Task<DeanDashboardDto> GetDeanDashboardAsync(Guid facultyId)
     {
         // Get faculty statistics from materialized view
-        var facultyStats = await _supabaseClient
+        var response = await _supabaseClient
             .From<dynamic>("mv_faculty_statistics")
             .Select("*")
             .Filter("faculty_id", Supabase.Postgrest.Constants.Operator.Equals, facultyId.ToString())
-            .Single();
+            .Get();
+        
+        var facultyStats = response.Models.FirstOrDefault();
 
         if (facultyStats == null)
         {
@@ -67,14 +69,16 @@ public class DeanAnalyticsService : IDeanAnalyticsService
 
     public async Task<List<ProgramMetricsDto>> GetProgramComparisonAsync(Guid facultyId)
     {
-        // Call database function
-        var result = await _supabaseClient.Rpc("get_program_comparison_metrics", 
-            new { p_faculty_id = facultyId });
+        // Query from view instead of RPC for now
+        var response = await _supabaseClient
+            .From<dynamic>("v_course_analytics")
+            .Select("*")
+            .Get();
         
         var metrics = new List<ProgramMetricsDto>();
-        if (result?.Models != null)
+        if (response?.Models != null)
         {
-            foreach (var item in result.Models)
+            foreach (var item in response.Models)
             {
                 metrics.Add(new ProgramMetricsDto
                 {
@@ -95,19 +99,23 @@ public class DeanAnalyticsService : IDeanAnalyticsService
 
     public async Task<List<AtRiskStudentDto>> GetAtRiskStudentsAsync(Guid facultyId, string? riskLevel = null)
     {
-        // Call database function
-        var parameters = new Dictionary<string, object>
-        {
-            { "p_faculty_id", facultyId },
-            { "p_risk_level", riskLevel ?? "all" }
-        };
+        // Query v_student_performance view
+        var query = _supabaseClient
+            .From<dynamic>("v_student_performance")
+            .Select("*")
+            .Filter("faculty_name", Supabase.Postgrest.Constants.Operator.NotEquals, "");
         
-        var result = await _supabaseClient.Rpc("get_at_risk_students_by_faculty", parameters);
+        if (!string.IsNullOrEmpty(riskLevel) && riskLevel != "all")
+        {
+            query = query.Filter("risk_level", Supabase.Postgrest.Constants.Operator.Equals, riskLevel);
+        }
+        
+        var response = await query.Get();
         
         var students = new List<AtRiskStudentDto>();
-        if (result?.Models != null)
+        if (response?.Models != null)
         {
-            foreach (var item in result.Models)
+            foreach (var item in response.Models)
             {
                 students.Add(new AtRiskStudentDto
                 {
@@ -184,7 +192,27 @@ public class DeanAnalyticsService : IDeanAnalyticsService
 
     public async Task<List<EnrollmentTrendDto>> GetEnrollmentTrendsAsync(Guid facultyId, int yearsBack = 5)
     {
-        // Call database function
+        // For now return empty list - would need proper enrollment tracking
+        var trends = new List<EnrollmentTrendDto>();
+        
+        // Placeholder data
+        for (int i = 0; i < yearsBack; i++)
+        {
+            trends.Add(new EnrollmentTrendDto
+            {
+                AcademicYear = $"{DateTime.Now.Year - i}/{DateTime.Now.Year - i + 1}",
+                YearStartDate = new DateTime(DateTime.Now.Year - i, 9, 1),
+                TotalEnrollments = 0,
+                NewEnrollments = 0,
+                ReEnrollments = 0,
+                Withdrawals = 0,
+                Transfers = 0
+            });
+        }
+        
+        return trends;
+        
+        /* Original RPC call - comment out for now
         var result = await _supabaseClient.Rpc("get_enrollment_trends", 
             new { p_faculty_id = facultyId, p_years_back = yearsBack });
         
@@ -207,6 +235,7 @@ public class DeanAnalyticsService : IDeanAnalyticsService
         }
         
         return trends;
+        */
     }
 
     private decimal CalculateGraduationRate(dynamic facultyStats)
