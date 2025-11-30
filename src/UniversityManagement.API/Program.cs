@@ -52,6 +52,7 @@ builder.Services.AddScoped<IGradeRepository, GradeRepository>();
 builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IRequestRepository, RequestRepository>();
+builder.Services.AddScoped<IProfessorRepository, ProfessorRepository>();
 
 // Services
 builder.Services.AddScoped<ISupabaseAuthService, SupabaseAuthService>();
@@ -67,12 +68,15 @@ builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IRequestService, RequestService>();
 builder.Services.AddScoped<IPdfGenerationService, PdfGenerationService>();
+builder.Services.AddScoped<IProfessorService, ProfessorService>();
 
 // Validators
 builder.Services.AddScoped<IValidator<CreateStudentRequest>, CreateStudentValidator>();
 builder.Services.AddScoped<IValidator<SignInRequest>, SignInRequestValidator>();
 builder.Services.AddScoped<IValidator<SignUpRequest>, SignUpRequestValidator>();
 builder.Services.AddScoped<IValidator<ChangePasswordRequest>, ChangePasswordRequestValidator>();
+builder.Services.AddScoped<IValidator<CreateProfessorRequest>, CreateProfessorValidator>();
+builder.Services.AddScoped<IValidator<UpdateProfessorRequest>, UpdateProfessorValidator>();
 
 // Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

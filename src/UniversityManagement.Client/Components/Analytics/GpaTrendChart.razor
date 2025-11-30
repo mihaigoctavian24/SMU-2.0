@@ -1,0 +1,45 @@
+@* GPA Trend Line Chart Component *@
+@using ApexCharts
+
+<MudPaper Elevation="2" Class="pa-4">
+    <MudText Typo="Typo.h6" Class="mb-4">GPA Trend</MudText>
+    
+    @if (IsLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (ChartData == null || !ChartData.Any())
+    {
+        <MudAlert Severity="Severity.Info">No GPA data available yet.</MudAlert>
+    }
+    else
+    {
+        <ApexChart TItem="GpaTrendDataPoint"
+                   Title="Semester GPA Performance"
+                   Height="300">
+            
+            <ApexPointSeries TItem="GpaTrendDataPoint"
+                             Items="ChartData"
+                             Name="GPA"
+                             SeriesType="SeriesType.Line"
+                             XValue="@(e => e.SemesterName)"
+                             YValue="@(e => (decimal)e.Gpa)"
+                             Color="#2E93fA"
+                             Smooth="true" />
+        </ApexChart>
+    }
+</MudPaper>
+
+@code {
+    [Parameter]
+    public List<GpaTrendDataPoint>? ChartData { get; set; }
+    
+    [Parameter]
+    public bool IsLoading { get; set; }
+    
+    public class GpaTrendDataPoint
+    {
+        public string SemesterName { get; set; } = string.Empty;
+        public decimal Gpa { get; set; }
+    }
+}

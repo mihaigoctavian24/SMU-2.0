@@ -1,0 +1,108 @@
+@* Pending Tasks Card Component for Professor Dashboard *@
+@using UniversityManagement.Shared.DTOs.Analytics
+
+<MudPaper Elevation="2" Class="pa-4">
+    <MudStack Spacing="3">
+        <MudText Typo="Typo.h6">Pending Tasks</MudText>
+        
+        @if (IsLoading)
+        {
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+        }
+        else if (PendingTasks == null)
+        {
+            <MudAlert Severity="Severity.Error">Failed to load pending tasks.</MudAlert>
+        }
+        else
+        {
+            @* Summary Cards *@
+            <MudGrid>
+                <MudItem xs="4">
+                    <MudPaper Outlined="true" Class="pa-3">
+                        <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Filled.Grade" Color="Color.Warning" Size="Size.Large" />
+                            <MudText Typo="Typo.h5">@PendingTasks.GradesToSubmit</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Grades to Submit</MudText>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+                
+                <MudItem xs="4">
+                    <MudPaper Outlined="true" Class="pa-3">
+                        <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Filled.RateReview" Color="Color.Info" Size="Size.Large" />
+                            <MudText Typo="Typo.h5">@PendingTasks.ContestsToReview</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Contests to Review</MudText>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+                
+                <MudItem xs="4">
+                    <MudPaper Outlined="true" Class="pa-3">
+                        <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Primary" Size="Size.Large" />
+                            <MudText Typo="Typo.h5">@PendingTasks.AttendanceToMark</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Attendance to Mark</MudText>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+            
+            @* Detailed Task List *@
+            @if (PendingTasks.Items.Any())
+            {
+                <MudDivider />
+                <MudText Typo="Typo.subtitle2">Task Details</MudText>
+                <MudList>
+                    @foreach (var task in PendingTasks.Items)
+                    {
+                        <MudListItem Icon="@GetTaskIcon(task.Type)">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                <MudStack Spacing="1">
+                                    <MudText Typo="Typo.body1"><strong>@task.Description</strong></MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@task.CourseName</MudText>
+                                </MudStack>
+                                <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
+                                    <MudChip Size="Size.Small" Color="@GetPriorityColor(task.Priority)">
+                                        @task.Count item(s)
+                                    </MudChip>
+                                </MudStack>
+                            </MudStack>
+                        </MudListItem>
+                        <MudDivider />
+                    }
+                </MudList>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Success" Dense="true">
+                    <strong>All caught up!</strong> No pending tasks at this time.
+                </MudAlert>
+            }
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public PendingTasksDto? PendingTasks { get; set; }
+    
+    [Parameter]
+    public bool IsLoading { get; set; }
+    
+    private string GetTaskIcon(string type) => type.ToLower() switch
+    {
+        "grade" => Icons.Material.Filled.Grade,
+        "contest" => Icons.Material.Filled.RateReview,
+        "attendance" => Icons.Material.Filled.EventAvailable,
+        _ => Icons.Material.Filled.Task
+    };
+    
+    private Color GetPriorityColor(string priority) => priority.ToLower() switch
+    {
+        "high" => Color.Error,
+        "normal" => Color.Warning,
+        "low" => Color.Info,
+        _ => Color.Default
+    };
+}

@@ -1,0 +1,144 @@
+@* Faculty Comparison Radar Chart Component for Rector Dashboard *@
+@using UniversityManagement.Shared.DTOs.Analytics
+@using ApexCharts
+
+<MudPaper Elevation="2" Class="pa-4">
+    <MudText Typo="Typo.h6" Class="mb-4">Faculty Performance Comparison</MudText>
+    
+    @if (IsLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (Faculties == null || !Faculties.Any())
+    {
+        <MudAlert Severity="Severity.Info">No faculty data available.</MudAlert>
+    }
+    else
+    {
+        <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-4">
+            <MudTabPanel Text="Overview Table">
+                <MudTable Items="@Faculties" Hover="true" Dense="true" Striped="true">
+                    <HeaderContent>
+                        <MudTh>Faculty</MudTh>
+                        <MudTh>Students</MudTh>
+                        <MudTh>Programs</MudTh>
+                        <MudTh>Professors</MudTh>
+                        <MudTh>Avg GPA</MudTh>
+                        <MudTh>Pass Rate</MudTh>
+                        <MudTh>Graduation Rate</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Faculty">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.body2"><strong>@context.FacultyName</strong></MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@context.FacultyShortName</MudText>
+                            </MudStack>
+                        </MudTd>
+                        <MudTd DataLabel="Students">@context.TotalStudents</MudTd>
+                        <MudTd DataLabel="Programs">@context.TotalPrograms</MudTd>
+                        <MudTd DataLabel="Professors">@context.TotalProfessors</MudTd>
+                        <MudTd DataLabel="Avg GPA">
+                            <MudChip Size="Size.Small" Color="@GetGpaColor(context.AverageGpa)">
+                                @context.AverageGpa.ToString("F2")
+                            </MudChip>
+                        </MudTd>
+                        <MudTd DataLabel="Pass Rate">@context.PassRate.ToString("F1")%</MudTd>
+                        <MudTd DataLabel="Graduation Rate">@context.GraduationRate.ToString("F1")%</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudTabPanel>
+            
+            <MudTabPanel Text="GPA Comparison">
+                <ApexChart TItem="FacultyDataPoint"
+                           Title="Average GPA by Faculty"
+                           Height="350">
+                    <ApexPointSeries TItem="FacultyDataPoint"
+                                     Items="@facultyGpaData"
+                                     Name="Average GPA"
+                                     SeriesType="SeriesType.Bar"
+                                     XValue="@(e => e.FacultyName)"
+                                     YValue="@(e => (decimal)e.Value)"
+                                     Color="#2E93fA" />
+                </ApexChart>
+            </MudTabPanel>
+            
+            <MudTabPanel Text="Pass Rate">
+                <ApexChart TItem="FacultyDataPoint"
+                           Title="Pass Rate by Faculty"
+                           Height="350">
+                    <ApexPointSeries TItem="FacultyDataPoint"
+                                     Items="@facultyPassRateData"
+                                     Name="Pass Rate (%)"
+                                     SeriesType="SeriesType.Bar"
+                                     XValue="@(e => e.FacultyName)"
+                                     YValue="@(e => (decimal)e.Value)"
+                                     Color="#00E396" />
+                </ApexChart>
+            </MudTabPanel>
+            
+            <MudTabPanel Text="Student Distribution">
+                <ApexChart TItem="FacultyDataPoint"
+                           Title="Student Enrollment by Faculty"
+                           Height="350">
+                    <ApexPointSeries TItem="FacultyDataPoint"
+                                     Items="@facultyStudentData"
+                                     Name="Total Students"
+                                     SeriesType="SeriesType.Donut"
+                                     XValue="@(e => e.FacultyName)"
+                                     YValue="@(e => (decimal)e.Value)" />
+                </ApexChart>
+            </MudTabPanel>
+        </MudTabs>
+    }
+</MudPaper>
+
+@code {
+    [Parameter]
+    public List<FacultyComparisonDto>? Faculties { get; set; }
+    
+    [Parameter]
+    public bool IsLoading { get; set; }
+    
+    private List<FacultyDataPoint>? facultyGpaData;
+    private List<FacultyDataPoint>? facultyPassRateData;
+    private List<FacultyDataPoint>? facultyStudentData;
+    
+    protected override void OnParametersSet()
+    {
+        if (Faculties != null)
+        {
+            facultyGpaData = Faculties.Select(f => new FacultyDataPoint 
+            { 
+                FacultyName = f.FacultyShortName, 
+                Value = f.AverageGpa 
+            }).ToList();
+            
+            facultyPassRateData = Faculties.Select(f => new FacultyDataPoint 
+            { 
+                FacultyName = f.FacultyShortName, 
+                Value = f.PassRate 
+            }).ToList();
+            
+            facultyStudentData = Faculties.Select(f => new FacultyDataPoint 
+            { 
+                FacultyName = f.FacultyShortName, 
+                Value = f.TotalStudents 
+            }).ToList();
+        }
+    }
+    
+    private Color GetGpaColor(decimal gpa) => gpa switch
+    {
+        >= 9.0m => Color.Success,
+        >= 8.0m => Color.Info,
+        >= 7.0m => Color.Primary,
+        >= 6.0m => Color.Warning,
+        _ => Color.Error
+    };
+    
+    public class FacultyDataPoint
+    {
+        public string FacultyName { get; set; } = string.Empty;
+        public decimal Value { get; set; }
+    }
+}

@@ -1,0 +1,81 @@
+@* Credit Progress Bar Component *@
+
+<MudPaper Elevation="2" Class="pa-4">
+    <MudStack Spacing="3">
+        <MudText Typo="Typo.h6">Credit Progress</MudText>
+        
+        @if (IsLoading)
+        {
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+        }
+        else
+        {
+            <MudStack Spacing="2">
+                <MudStack Row="true" Justify="Justify.SpaceBetween">
+                    <MudText Typo="Typo.body2">
+                        <strong>@CreditsEarned</strong> / @TotalCreditsRequired credits
+                    </MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Primary">
+                        <strong>@ProgressPercentage%</strong>
+                    </MudText>
+                </MudStack>
+                
+                <MudProgressLinear Color="Color.Primary" 
+                                   Value="@ProgressPercentage" 
+                                   Size="Size.Large"
+                                   Rounded="true" 
+                                   Striped="true" />
+                
+                <MudStack Row="true" Spacing="4">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Earned</MudText>
+                        <MudText Typo="Typo.body1"><strong>@CreditsEarned</strong></MudText>
+                    </MudStack>
+                    
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">In Progress</MudText>
+                        <MudText Typo="Typo.body1"><strong>@CreditsInProgress</strong></MudText>
+                    </MudStack>
+                    
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Remaining</MudText>
+                        <MudText Typo="Typo.body1"><strong>@CreditsRemaining</strong></MudText>
+                    </MudStack>
+                </MudStack>
+                
+                @if (CreditsRemaining > 0)
+                {
+                    <MudAlert Severity="Severity.Info" Dense="true">
+                        You need <strong>@CreditsRemaining more credits</strong> to complete your program.
+                    </MudAlert>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Success" Dense="true">
+                        <strong>Congratulations!</strong> You've completed all required credits.
+                    </MudAlert>
+                }
+            </MudStack>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public int CreditsEarned { get; set; }
+    
+    [Parameter]
+    public int CreditsInProgress { get; set; }
+    
+    [Parameter]
+    public int TotalCreditsRequired { get; set; }
+    
+    [Parameter]
+    public bool IsLoading { get; set; }
+    
+    private int CreditsRemaining => Math.Max(0, TotalCreditsRequired - CreditsEarned);
+    
+    private double ProgressPercentage => TotalCreditsRequired > 0 
+        ? Math.Round((double)CreditsEarned / TotalCreditsRequired * 100, 1)
+        : 0;
+}

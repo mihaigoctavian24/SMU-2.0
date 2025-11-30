@@ -1,0 +1,69 @@
+@* KPI Card Component - Displays a single KPI metric with trend indicator *@
+
+<MudPaper Elevation="2" Class="pa-4 mud-height-full">
+    <MudStack Spacing="2">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@Title</MudText>
+                <MudText Typo="Typo.h4" Style="font-weight: 600;">@Value</MudText>
+            </MudStack>
+            @if (!string.IsNullOrEmpty(Icon))
+            {
+                <MudIcon Icon="@Icon" Color="@IconColor" Size="Size.Large" />
+            }
+        </MudStack>
+        
+        @if (TrendValue.HasValue)
+        {
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                @if (TrendValue > 0)
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.TrendingUp" Color="Color.Success" Size="Size.Small" />
+                    <MudText Typo="Typo.caption" Color="Color.Success">+@TrendValue.Value.ToString("F1")%</MudText>
+                }
+                else if (TrendValue < 0)
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.TrendingDown" Color="Color.Error" Size="Size.Small" />
+                    <MudText Typo="Typo.caption" Color="Color.Error">@TrendValue.Value.ToString("F1")%</MudText>
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.TrendingFlat" Color="Color.Default" Size="Size.Small" />
+                    <MudText Typo="Typo.caption" Color="Color.Default">No change</MudText>
+                }
+                @if (!string.IsNullOrEmpty(TrendLabel))
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@TrendLabel</MudText>
+                }
+            </MudStack>
+        }
+        
+        @if (!string.IsNullOrEmpty(Subtitle))
+        {
+            <MudText Typo="Typo.caption" Color="Color.Secondary">@Subtitle</MudText>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+    
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
+    
+    [Parameter]
+    public string? Subtitle { get; set; }
+    
+    [Parameter]
+    public string? Icon { get; set; }
+    
+    [Parameter]
+    public Color IconColor { get; set; } = Color.Primary;
+    
+    [Parameter]
+    public decimal? TrendValue { get; set; }
+    
+    [Parameter]
+    public string? TrendLabel { get; set; }
+}

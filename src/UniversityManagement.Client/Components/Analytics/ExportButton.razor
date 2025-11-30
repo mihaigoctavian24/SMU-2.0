@@ -1,0 +1,103 @@
+@* Export Button Component - Allows users to export dashboard data *@
+@using UniversityManagement.Shared.DTOs.Analytics
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject IJSRuntime JS
+
+<MudMenu Icon="@Icons.Material.Filled.Download" 
+         Color="Color.Primary" 
+         Variant="Variant.Filled"
+         Size="Size.Medium"
+         Label="Export Report"
+         EndIcon="@Icons.Material.Filled.KeyboardArrowDown">
+    <MudMenuItem OnClick="@(() => ExportReport(ExportFormat.Pdf))">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            <MudIcon Icon="@Icons.Material.Filled.PictureAsPdf" Color="Color.Error" />
+            <MudText>Export as PDF</MudText>
+        </MudStack>
+    </MudMenuItem>
+    <MudMenuItem OnClick="@(() => ExportReport(ExportFormat.Excel))">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            <MudIcon Icon="@Icons.Material.Filled.TableChart" Color="Color.Success" />
+            <MudText>Export as Excel</MudText>
+        </MudStack>
+    </MudMenuItem>
+    <MudMenuItem OnClick="@(() => ExportReport(ExportFormat.Csv))">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            <MudIcon Icon="@Icons.Material.Filled.Description" Color="Color.Info" />
+            <MudText>Export as CSV</MudText>
+        </MudStack>
+    </MudMenuItem>
+</MudMenu>
+
+@code {
+    [Parameter]
+    public string ExportEndpoint { get; set; } = string.Empty;
+    
+    [Parameter]
+    public Guid UserId { get; set; }
+    
+    [Parameter]
+    public string ReportName { get; set; } = "Report";
+    
+    private bool isExporting = false;
+    
+    private async Task ExportReport(ExportFormat format)
+    {
+        if (isExporting) return;
+        
+        try
+        {
+            isExporting = true;
+            Snackbar.Add($"Generating {format} report...", Severity.Info);
+            
+            var formatParam = format.ToString().ToLower();
+            var url = $"{ExportEndpoint}?format={formatParam}";
+            
+            var response = await Http.GetAsync(url);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var fileBytes = await response.Content.ReadAsByteArrayAsync();
+                var contentType = response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream";
+                var fileName = GetFileName(format);
+                
+                await DownloadFile(fileBytes, fileName, contentType);
+                
+                Snackbar.Add($"Report exported successfully!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Failed to export report: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error exporting report: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isExporting = false;
+        }
+    }
+    
+    private async Task DownloadFile(byte[] fileBytes, string fileName, string contentType)
+    {
+        var base64 = Convert.ToBase64String(fileBytes);
+        await JS.InvokeVoidAsync("downloadFile", fileName, base64, contentType);
+    }
+    
+    private string GetFileName(ExportFormat format)
+    {
+        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        var extension = format switch
+        {
+            ExportFormat.Pdf => "pdf",
+            ExportFormat.Excel => "xlsx",
+            ExportFormat.Csv => "csv",
+            _ => "dat"
+        };
+        
+        return $"{ReportName}_{timestamp}.{extension}";
+    }
+}

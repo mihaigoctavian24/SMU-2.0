@@ -1,0 +1,43 @@
+@* Attendance Breakdown Donut Chart Component *@
+@using ApexCharts
+
+<MudPaper Elevation="2" Class="pa-4">
+    <MudText Typo="Typo.h6" Class="mb-4">Attendance Breakdown</MudText>
+    
+    @if (IsLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (ChartData == null || !ChartData.Any())
+    {
+        <MudAlert Severity="Severity.Info">No attendance data available yet.</MudAlert>
+    }
+    else
+    {
+        <ApexChart TItem="AttendanceDataPoint"
+                   Title="Attendance Status Distribution"
+                   Height="350">
+            
+            <ApexPointSeries TItem="AttendanceDataPoint"
+                             Items="ChartData"
+                             SeriesType="SeriesType.Donut"
+                             Name="Sessions"
+                             XValue="@(e => e.Status)"
+                             YValue="@(e => (decimal)e.Count)" />
+        </ApexChart>
+    }
+</MudPaper>
+
+@code {
+    [Parameter]
+    public List<AttendanceDataPoint>? ChartData { get; set; }
+    
+    [Parameter]
+    public bool IsLoading { get; set; }
+    
+    public class AttendanceDataPoint
+    {
+        public string Status { get; set; } = string.Empty;
+        public int Count { get; set; }
+    }
+}

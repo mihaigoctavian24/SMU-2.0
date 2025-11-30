@@ -1,0 +1,241 @@
+@page "/professor/dashboard"
+@using UniversityManagement.Shared.DTOs.Analytics
+@using UniversityManagement.Client.Components.Analytics
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@attribute [Authorize(Roles = "professor")]
+
+<PageTitle>Professor Dashboard - Analytics</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-4">
+    @if (isLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+        <MudText Align="Align.Center" Class="mt-4">Loading dashboard data...</MudText>
+    }
+    else if (dashboardData == null)
+    {
+        <MudAlert Severity="Severity.Error">Failed to load dashboard data. Please try again later.</MudAlert>
+    }
+    else
+    {
+        @* Header Section *@
+        <MudPaper Elevation="0" Class="pa-4 mb-4">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h4">Welcome, @dashboardData.Title @dashboardData.ProfessorName!</MudText>
+                    <MudText Typo="Typo.body1" Color="Color.Secondary">
+                        Teaching @dashboardData.TotalCoursesTeaching course(s) • @dashboardData.TotalStudents total students
+                    </MudText>
+                </MudStack>
+                
+                @* Quick Actions *@
+                <MudStack Row="true" Spacing="2">
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Primary" 
+                               StartIcon="@Icons.Material.Filled.Grade"
+                               Disabled="@(dashboardData.PendingGrades == 0)">
+                        Submit Grades (@dashboardData.PendingGrades)
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined" 
+                               Color="Color.Secondary" 
+                               StartIcon="@Icons.Material.Filled.EventAvailable">
+                        Mark Attendance
+                    </MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+
+        @* KPI Cards Row *@
+        <MudGrid Class="mb-4">
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Courses Teaching"
+                         Value="@dashboardData.TotalCoursesTeaching.ToString()"
+                         Icon="@Icons.Material.Filled.MenuBook"
+                         IconColor="Color.Primary"
+                         Subtitle="Active this semester" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Total Students"
+                         Value="@dashboardData.TotalStudents.ToString()"
+                         Icon="@Icons.Material.Filled.People"
+                         IconColor="Color.Info"
+                         Subtitle="Across all courses" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Pending Grades"
+                         Value="@dashboardData.PendingGrades.ToString()"
+                         Icon="@Icons.Material.Filled.Grade"
+                         IconColor="@(dashboardData.PendingGrades > 0 ? Color.Warning : Color.Success)"
+                         Subtitle="@(dashboardData.PendingGrades > 0 ? \"Action required\" : \"All submitted\")" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Avg Class Performance"
+                         Value="@dashboardData.AverageClassPerformance.ToString("F2")"
+                         Icon="@Icons.Material.Filled.TrendingUp"
+                         IconColor="Color.Success"
+                         Subtitle="@GetPerformanceRating(dashboardData.AverageClassPerformance)" />
+            </MudItem>
+        </MudGrid>
+
+        @* Charts Row: Grade Distribution and Course Comparison *@
+        <MudGrid Class="mb-4">
+            <MudItem xs="12" md="6">
+                <GradeDistributionChart ChartData="@gradeDistributionData" IsLoading="@isLoadingGrades" />
+            </MudItem>
+            
+            <MudItem xs="12" md="6">
+                <MudPaper Elevation="2" Class="pa-4">
+                    <MudText Typo="Typo.h6" Class="mb-4">Course Comparison</MudText>
+                    @if (isLoadingCourses)
+                    {
+                        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+                    }
+                    else if (courseComparisonData == null || !courseComparisonData.Any())
+                    {
+                        <MudAlert Severity="Severity.Info">No course data available.</MudAlert>
+                    }
+                    else
+                    {
+                        <ApexCharts.ApexChart TItem="CourseComparisonDataPoint"
+                                   Title="Average Grade by Course"
+                                   Height="300">
+                            <ApexCharts.ApexPointSeries TItem="CourseComparisonDataPoint"
+                                             Items="courseComparisonData"
+                                             Name="Average Grade"
+                                             SeriesType="ApexCharts.SeriesType.Bar"
+                                             XValue="@(e => e.CourseName)"
+                                             YValue="@(e => (decimal)e.AverageGrade)"
+                                             Color="#FEB019" />
+                        </ApexCharts.ApexChart>
+                    }
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        @* Course Performance Table *@
+        <MudGrid Class="mb-4">
+            <MudItem xs="12">
+                <CoursePerformanceTable Courses="@dashboardData.CoursePerformances" IsLoading="@isLoadingCourses" />
+            </MudItem>
+        </MudGrid>
+
+        @* Pending Tasks *@
+        <MudGrid>
+            <MudItem xs="12">
+                <PendingTasksCard PendingTasks="@dashboardData.PendingTasks" IsLoading="@isLoadingTasks" />
+            </MudItem>
+        </MudGrid>
+    }
+</MudContainer>
+
+@code {
+    private bool isLoading = true;
+    private bool isLoadingGrades = true;
+    private bool isLoadingCourses = true;
+    private bool isLoadingTasks = false;
+    
+    private ProfessorDashboardDto? dashboardData;
+    private List<GradeDistributionChart.GradeDistributionDataPoint>? gradeDistributionData;
+    private List<CourseComparisonDataPoint>? courseComparisonData;
+    
+    // This would come from authentication state
+    private Guid currentProfessorId = Guid.NewGuid(); // Replace with actual professor ID from auth
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardData();
+    }
+    
+    private async Task LoadDashboardData()
+    {
+        try
+        {
+            isLoading = true;
+            
+            // Load main dashboard data
+            dashboardData = await Http.GetFromJsonAsync<ProfessorDashboardDto>(
+                $"api/analytics/professor/{currentProfessorId}/dashboard");
+            
+            if (dashboardData != null)
+            {
+                LoadGradeDistributionData();
+                LoadCourseComparisonData();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading dashboard: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    private void LoadGradeDistributionData()
+    {
+        try
+        {
+            isLoadingGrades = true;
+            
+            if (dashboardData?.OverallGradeDistribution != null)
+            {
+                gradeDistributionData = dashboardData.OverallGradeDistribution
+                    .Select(x => new GradeDistributionChart.GradeDistributionDataPoint
+                    {
+                        GradeCategory = x.Key.ToString(),
+                        Count = x.Value
+                    })
+                    .OrderByDescending(x => x.GradeCategory)
+                    .ToList();
+            }
+        }
+        finally
+        {
+            isLoadingGrades = false;
+        }
+    }
+    
+    private void LoadCourseComparisonData()
+    {
+        try
+        {
+            isLoadingCourses = true;
+            
+            if (dashboardData?.CoursePerformances != null)
+            {
+                courseComparisonData = dashboardData.CoursePerformances
+                    .Select(x => new CourseComparisonDataPoint
+                    {
+                        CourseName = $"{x.CourseCode}",
+                        AverageGrade = x.AverageGrade
+                    })
+                    .ToList();
+            }
+        }
+        finally
+        {
+            isLoadingCourses = false;
+        }
+    }
+    
+    // Helper methods
+    private string GetPerformanceRating(decimal avgGrade) => avgGrade switch
+    {
+        >= 9.0m => "Excellent",
+        >= 8.0m => "Very Good",
+        >= 7.0m => "Good",
+        >= 6.0m => "Satisfactory",
+        _ => "Needs Improvement"
+    };
+    
+    public class CourseComparisonDataPoint
+    {
+        public string CourseName { get; set; } = string.Empty;
+        public decimal AverageGrade { get; set; }
+    }
+}

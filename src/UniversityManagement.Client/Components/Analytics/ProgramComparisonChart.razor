@@ -1,0 +1,104 @@
+@* Program Comparison Chart Component for Dean Dashboard *@
+@using UniversityManagement.Shared.DTOs.Analytics
+@using ApexCharts
+
+<MudPaper Elevation="2" Class="pa-4">
+    <MudText Typo="Typo.h6" Class="mb-4">Program Comparison</MudText>
+    
+    @if (IsLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (Programs == null || !Programs.Any())
+    {
+        <MudAlert Severity="Severity.Info">No program data available.</MudAlert>
+    }
+    else
+    {
+        <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-4">
+            <MudTabPanel Text="GPA Comparison">
+                <ApexChart TItem="ProgramDataPoint"
+                           Title="Average GPA by Program"
+                           Height="350">
+                    <ApexPointSeries TItem="ProgramDataPoint"
+                                     Items="@programGpaData"
+                                     Name="Average GPA"
+                                     SeriesType="SeriesType.Bar"
+                                     XValue="@(e => e.ProgramName)"
+                                     YValue="@(e => (decimal)e.Value)"
+                                     Color="#2E93fA" />
+                </ApexChart>
+            </MudTabPanel>
+            
+            <MudTabPanel Text="Pass Rate">
+                <ApexChart TItem="ProgramDataPoint"
+                           Title="Pass Rate by Program"
+                           Height="350">
+                    <ApexPointSeries TItem="ProgramDataPoint"
+                                     Items="@programPassRateData"
+                                     Name="Pass Rate (%)"
+                                     SeriesType="SeriesType.Bar"
+                                     XValue="@(e => e.ProgramName)"
+                                     YValue="@(e => (decimal)e.Value)"
+                                     Color="#00E396" />
+                </ApexChart>
+            </MudTabPanel>
+            
+            <MudTabPanel Text="Enrollment">
+                <ApexChart TItem="ProgramDataPoint"
+                           Title="Student Enrollment by Program"
+                           Height="350">
+                    <ApexPointSeries TItem="ProgramDataPoint"
+                                     Items="@programEnrollmentData"
+                                     Name="Total Students"
+                                     SeriesType="SeriesType.Bar"
+                                     XValue="@(e => e.ProgramName)"
+                                     YValue="@(e => (decimal)e.Value)"
+                                     Color="#FEB019" />
+                </ApexChart>
+            </MudTabPanel>
+        </MudTabs>
+    }
+</MudPaper>
+
+@code {
+    [Parameter]
+    public List<ProgramMetricsDto>? Programs { get; set; }
+    
+    [Parameter]
+    public bool IsLoading { get; set; }
+    
+    private List<ProgramDataPoint>? programGpaData;
+    private List<ProgramDataPoint>? programPassRateData;
+    private List<ProgramDataPoint>? programEnrollmentData;
+    
+    protected override void OnParametersSet()
+    {
+        if (Programs != null)
+        {
+            programGpaData = Programs.Select(p => new ProgramDataPoint 
+            { 
+                ProgramName = p.ProgramName, 
+                Value = p.AverageGpa 
+            }).ToList();
+            
+            programPassRateData = Programs.Select(p => new ProgramDataPoint 
+            { 
+                ProgramName = p.ProgramName, 
+                Value = p.PassRate 
+            }).ToList();
+            
+            programEnrollmentData = Programs.Select(p => new ProgramDataPoint 
+            { 
+                ProgramName = p.ProgramName, 
+                Value = p.TotalStudents 
+            }).ToList();
+        }
+    }
+    
+    public class ProgramDataPoint
+    {
+        public string ProgramName { get; set; } = string.Empty;
+        public decimal Value { get; set; }
+    }
+}

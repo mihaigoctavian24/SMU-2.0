@@ -1,0 +1,349 @@
+@page "/student/dashboard"
+@using UniversityManagement.Shared.DTOs.Analytics
+@using UniversityManagement.Client.Components.Analytics
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@attribute [Authorize(Roles = "student")]
+
+<PageTitle>Student Dashboard - Analytics</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-4">
+    @if (isLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+        <MudText Align="Align.Center" Class="mt-4">Loading dashboard data...</MudText>
+    }
+    else if (dashboardData == null)
+    {
+        <MudAlert Severity="Severity.Error">Failed to load dashboard data. Please try again later.</MudAlert>
+    }
+    else
+    {
+        @* Header Section *@
+        <MudPaper Elevation="0" Class="pa-4 mb-4">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h4">Welcome back, @dashboardData.StudentName!</MudText>
+                    <MudText Typo="Typo.body1" Color="Color.Secondary">
+                        @dashboardData.ProgramName • @dashboardData.FacultyName • Year @dashboardData.YearOfStudy
+                    </MudText>
+                </MudStack>
+                
+                @* Risk Level Badge *@
+                @{
+                    var (severity, riskText) = GetRiskLevelDisplay(dashboardData.RiskLevel);
+                }
+                <MudChip Color="@severity" Size="Size.Large">@riskText</MudChip>
+            </MudStack>
+        </MudPaper>
+
+        @* KPI Cards Row *@
+        <MudGrid Class="mb-4">
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Current GPA"
+                         Value="@dashboardData.CurrentGpa.ToString("F2")"
+                         Icon="@Icons.Material.Filled.School"
+                         IconColor="Color.Primary"
+                         TrendValue="@dashboardData.GpaTrend"
+                         TrendLabel="vs last semester"
+                         Subtitle="@GetGpaRating(dashboardData.CurrentGpa)" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Attendance Rate"
+                         Value="@dashboardData.AttendanceRate.ToString("F1")%"
+                         Icon="@Icons.Material.Filled.EventAvailable"
+                         IconColor="Color.Success"
+                         TrendValue="@GetAttendanceTrend()"
+                         TrendLabel="vs last semester"
+                         Subtitle="@dashboardData.AttendanceBreakdown.PresentCount of @dashboardData.AttendanceBreakdown.TotalSessions sessions" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Credits Earned"
+                         Value="@dashboardData.CreditsEarned.ToString()"
+                         Icon="@Icons.Material.Filled.EmojiEvents"
+                         IconColor="Color.Warning"
+                         Subtitle="@dashboardData.TotalCreditsRequired total required" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Class Rank"
+                         Value="@GetRankDisplay()"
+                         Icon="@Icons.Material.Filled.Leaderboard"
+                         IconColor="Color.Info"
+                         Subtitle="@GetPercentileDisplay()" />
+            </MudItem>
+        </MudGrid>
+
+        @* Charts Row 1: GPA Trend and Grade Distribution *@
+        <MudGrid Class="mb-4">
+            <MudItem xs="12" md="8">
+                <GpaTrendChart ChartData="@gpaTrendData" IsLoading="@isLoadingGpaTrend" />
+            </MudItem>
+            
+            <MudItem xs="12" md="4">
+                <AttendanceDonutChart ChartData="@attendanceData" IsLoading="@isLoadingAttendance" />
+            </MudItem>
+        </MudGrid>
+
+        @* Charts Row 2: Grade Distribution and Credit Progress *@
+        <MudGrid Class="mb-4">
+            <MudItem xs="12" md="6">
+                <GradeDistributionChart ChartData="@gradeDistributionData" IsLoading="@isLoadingGrades" />
+            </MudItem>
+            
+            <MudItem xs="12" md="6">
+                <CreditProgressBar CreditsEarned="@dashboardData.CreditsEarned"
+                                   CreditsInProgress="@(dashboardData.TotalCreditsAttempted - dashboardData.CreditsEarned)"
+                                   TotalCreditsRequired="@dashboardData.TotalCreditsRequired"
+                                   IsLoading="@isLoadingCredits" />
+            </MudItem>
+        </MudGrid>
+
+        @* Recent Activities and Upcoming Deadlines *@
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudPaper Elevation="2" Class="pa-4">
+                    <MudText Typo="Typo.h6" Class="mb-3">Recent Activities</MudText>
+                    @if (dashboardData.RecentActivities.Any())
+                    {
+                        <MudList>
+                            @foreach (var activity in dashboardData.RecentActivities.Take(5))
+                            {
+                                <MudListItem Icon="@GetActivityIcon(activity.Type)" IconColor="@GetActivityColor(activity.Color)">
+                                    <MudStack Spacing="1">
+                                        <MudText Typo="Typo.body1"><strong>@activity.Title</strong></MudText>
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">@activity.Description</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @activity.Timestamp.ToString("MMM dd, yyyy - HH:mm")
+                                        </MudText>
+                                    </MudStack>
+                                </MudListItem>
+                                <MudDivider />
+                            }
+                        </MudList>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Info">No recent activities.</MudAlert>
+                    }
+                </MudPaper>
+            </MudItem>
+            
+            <MudItem xs="12" md="6">
+                <MudPaper Elevation="2" Class="pa-4">
+                    <MudText Typo="Typo.h6" Class="mb-3">Upcoming Deadlines</MudText>
+                    @if (dashboardData.UpcomingDeadlines.Any())
+                    {
+                        <MudList>
+                            @foreach (var deadline in dashboardData.UpcomingDeadlines.Take(5))
+                            {
+                                <MudListItem Icon="@GetDeadlineIcon(deadline.Type)">
+                                    <MudStack Spacing="1">
+                                        <MudStack Row="true" Justify="Justify.SpaceBetween">
+                                            <MudText Typo="Typo.body1"><strong>@deadline.Title</strong></MudText>
+                                            <MudChip Size="Size.Small" Color="@GetPriorityColor(deadline.Priority)">
+                                                @deadline.DaysRemaining day(s)
+                                            </MudChip>
+                                        </MudStack>
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">@deadline.CourseName</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            Due: @deadline.DueDate.ToString("MMM dd, yyyy")
+                                        </MudText>
+                                    </MudStack>
+                                </MudListItem>
+                                <MudDivider />
+                            }
+                        </MudList>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Success">No upcoming deadlines!</MudAlert>
+                    }
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    }
+</MudContainer>
+
+@code {
+    private bool isLoading = true;
+    private bool isLoadingGpaTrend = true;
+    private bool isLoadingGrades = true;
+    private bool isLoadingAttendance = true;
+    private bool isLoadingCredits = false;
+    
+    private StudentDashboardDto? dashboardData;
+    private List<GpaTrendChart.GpaTrendDataPoint>? gpaTrendData;
+    private List<GradeDistributionChart.GradeDistributionDataPoint>? gradeDistributionData;
+    private List<AttendanceDonutChart.AttendanceDataPoint>? attendanceData;
+    
+    // This would come from authentication state
+    private Guid currentStudentId = Guid.NewGuid(); // Replace with actual student ID from auth
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardData();
+    }
+    
+    private async Task LoadDashboardData()
+    {
+        try
+        {
+            isLoading = true;
+            
+            // Load main dashboard data
+            var dashboardTask = Http.GetFromJsonAsync<StudentDashboardDto>($"api/analytics/student/{currentStudentId}/dashboard");
+            var gpaTrendTask = LoadGpaTrendData();
+            var gradeDistTask = LoadGradeDistributionData();
+            var attendanceTask = LoadAttendanceData();
+            
+            await Task.WhenAll(dashboardTask, gpaTrendTask, gradeDistTask, attendanceTask);
+            
+            dashboardData = await dashboardTask;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading dashboard: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    private async Task LoadGpaTrendData()
+    {
+        try
+        {
+            isLoadingGpaTrend = true;
+            var data = await Http.GetFromJsonAsync<List<GpaTrendDto>>($"api/analytics/student/{currentStudentId}/gpa-trend");
+            gpaTrendData = data?.Select(x => new GpaTrendChart.GpaTrendDataPoint
+            {
+                SemesterName = x.SemesterName,
+                Gpa = x.Gpa
+            }).ToList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading GPA trend: {ex.Message}", Severity.Warning);
+        }
+        finally
+        {
+            isLoadingGpaTrend = false;
+        }
+    }
+    
+    private async Task LoadGradeDistributionData()
+    {
+        try
+        {
+            isLoadingGrades = true;
+            var data = await Http.GetFromJsonAsync<List<GradeDistributionDto>>($"api/analytics/student/{currentStudentId}/grade-distribution");
+            gradeDistributionData = data?.Select(x => new GradeDistributionChart.GradeDistributionDataPoint
+            {
+                GradeCategory = x.GradeValue.ToString(),
+                Count = x.GradeCount
+            }).ToList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading grade distribution: {ex.Message}", Severity.Warning);
+        }
+        finally
+        {
+            isLoadingGrades = false;
+        }
+    }
+    
+    private async Task LoadAttendanceData()
+    {
+        try
+        {
+            isLoadingAttendance = true;
+            if (dashboardData?.AttendanceBreakdown != null)
+            {
+                attendanceData = new List<AttendanceDonutChart.AttendanceDataPoint>
+                {
+                    new() { Status = "Present", Count = dashboardData.AttendanceBreakdown.PresentCount },
+                    new() { Status = "Absent", Count = dashboardData.AttendanceBreakdown.AbsentCount },
+                    new() { Status = "Excused", Count = dashboardData.AttendanceBreakdown.ExcusedCount },
+                    new() { Status = "Late", Count = dashboardData.AttendanceBreakdown.LateCount }
+                };
+            }
+            await Task.CompletedTask;
+        }
+        finally
+        {
+            isLoadingAttendance = false;
+        }
+    }
+    
+    // Helper methods
+    private (Color severity, string text) GetRiskLevelDisplay(string riskLevel) => riskLevel.ToLower() switch
+    {
+        "high_risk" => (Color.Error, "High Risk"),
+        "medium_risk" => (Color.Warning, "Medium Risk"),
+        _ => (Color.Success, "On Track")
+    };
+    
+    private string GetGpaRating(decimal gpa) => gpa switch
+    {
+        >= 9.5m => "Excellent",
+        >= 8.5m => "Very Good",
+        >= 7.0m => "Good",
+        >= 6.0m => "Satisfactory",
+        _ => "Needs Improvement"
+    };
+    
+    private decimal? GetAttendanceTrend()
+    {
+        if (dashboardData?.PreviousAttendanceRate.HasValue == true)
+        {
+            return dashboardData.AttendanceRate - dashboardData.PreviousAttendanceRate.Value;
+        }
+        return null;
+    }
+    
+    private string GetRankDisplay() => dashboardData?.ClassRank.HasValue == true
+        ? $"#{dashboardData.ClassRank}"
+        : "N/A";
+    
+    private string GetPercentileDisplay() => dashboardData?.ClassPercentile.HasValue == true
+        ? $"Top {100 - dashboardData.ClassPercentile.Value:F0}%"
+        : "Not enough data";
+    
+    private string GetActivityIcon(string type) => type.ToLower() switch
+    {
+        "grade" => Icons.Material.Filled.Grade,
+        "attendance" => Icons.Material.Filled.EventAvailable,
+        "request" => Icons.Material.Filled.RequestPage,
+        _ => Icons.Material.Filled.Notifications
+    };
+    
+    private Color GetActivityColor(string color) => color.ToLower() switch
+    {
+        "success" => Color.Success,
+        "warning" => Color.Warning,
+        "error" => Color.Error,
+        "info" => Color.Info,
+        _ => Color.Default
+    };
+    
+    private string GetDeadlineIcon(string type) => type.ToLower() switch
+    {
+        "exam" => Icons.Material.Filled.Quiz,
+        "assignment" => Icons.Material.Filled.Assignment,
+        "request" => Icons.Material.Filled.RequestPage,
+        _ => Icons.Material.Filled.Event
+    };
+    
+    private Color GetPriorityColor(string priority) => priority.ToLower() switch
+    {
+        "high" => Color.Error,
+        "normal" => Color.Warning,
+        "low" => Color.Info,
+        _ => Color.Default
+    };
+}

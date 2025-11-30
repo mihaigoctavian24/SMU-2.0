@@ -1,0 +1,87 @@
+@* Course Performance Table Component for Professor Dashboard *@
+@using UniversityManagement.Shared.DTOs.Analytics
+
+<MudPaper Elevation="2" Class="pa-4">
+    <MudText Typo="Typo.h6" Class="mb-4">Course Performance</MudText>
+    
+    @if (IsLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (Courses == null || !Courses.Any())
+    {
+        <MudAlert Severity="Severity.Info">No courses assigned yet.</MudAlert>
+    }
+    else
+    {
+        <MudTable Items="@Courses" Hover="true" Breakpoint="Breakpoint.Sm" Dense="true">
+            <HeaderContent>
+                <MudTh>Course</MudTh>
+                <MudTh>Semester</MudTh>
+                <MudTh>Students</MudTh>
+                <MudTh>Avg Grade</MudTh>
+                <MudTh>Pass Rate</MudTh>
+                <MudTh>Attendance</MudTh>
+                <MudTh>Pending</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Course">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.body2"><strong>@context.CourseName</strong></MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@context.CourseCode</MudText>
+                    </MudStack>
+                </MudTd>
+                <MudTd DataLabel="Semester">Sem @context.SemesterNumber</MudTd>
+                <MudTd DataLabel="Students">@context.TotalStudents</MudTd>
+                <MudTd DataLabel="Avg Grade">
+                    <MudChip Size="Size.Small" Color="@GetGradeColor(context.AverageGrade)">
+                        @context.AverageGrade.ToString("F2")
+                    </MudChip>
+                </MudTd>
+                <MudTd DataLabel="Pass Rate">
+                    <MudProgressLinear Value="@((double)context.PassRate)" 
+                                       Color="@GetPassRateColor(context.PassRate)" 
+                                       Size="Size.Small" 
+                                       Rounded="true">
+                        <MudText Typo="Typo.caption">@context.PassRate.ToString("F0")%</MudText>
+                    </MudProgressLinear>
+                </MudTd>
+                <MudTd DataLabel="Attendance">@context.AttendanceRate.ToString("F0")%</MudTd>
+                <MudTd DataLabel="Pending">
+                    @if (context.PendingGrades > 0)
+                    {
+                        <MudChip Size="Size.Small" Color="Color.Warning">@context.PendingGrades</MudChip>
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" />
+                    }
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</MudPaper>
+
+@code {
+    [Parameter]
+    public List<CoursePerformanceDto>? Courses { get; set; }
+    
+    [Parameter]
+    public bool IsLoading { get; set; }
+    
+    private Color GetGradeColor(decimal grade) => grade switch
+    {
+        >= 9.0m => Color.Success,
+        >= 8.0m => Color.Info,
+        >= 7.0m => Color.Primary,
+        >= 6.0m => Color.Warning,
+        _ => Color.Error
+    };
+    
+    private Color GetPassRateColor(decimal passRate) => passRate switch
+    {
+        >= 80m => Color.Success,
+        >= 60m => Color.Warning,
+        _ => Color.Error
+    };
+}

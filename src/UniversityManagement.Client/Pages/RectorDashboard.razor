@@ -1,0 +1,286 @@
+@page "/rector/dashboard"
+@using UniversityManagement.Shared.DTOs.Analytics
+@using UniversityManagement.Client.Components.Analytics
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@attribute [Authorize(Roles = "rector")]
+
+<PageTitle>Rector Dashboard - Analytics</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-4">
+    @if (isLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+        <MudText Align="Align.Center" Class="mt-4">Loading dashboard data...</MudText>
+    }
+    else if (dashboardData == null)
+    {
+        <MudAlert Severity="Severity.Error">Failed to load dashboard data. Please try again later.</MudAlert>
+    }
+    else
+    {
+        @* Header Section *@
+        <MudPaper Elevation="0" Class="pa-4 mb-4">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">University Overview - Rector @dashboardData.RectorName</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Secondary">
+                    @dashboardData.UniversityKpis.TotalFaculties faculties • 
+                    @dashboardData.UniversityKpis.TotalPrograms programs • 
+                    @dashboardData.UniversityKpis.TotalStudents students • 
+                    @dashboardData.UniversityKpis.TotalProfessors professors
+                </MudText>
+            </MudStack>
+        </MudPaper>
+
+        @* Main KPI Cards Row *@
+        <MudGrid Class="mb-4">
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Total Students"
+                         Value="@dashboardData.UniversityKpis.TotalStudents.ToString("N0")"
+                         Icon="@Icons.Material.Filled.People"
+                         IconColor="Color.Primary"
+                         TrendValue="@(dashboardData.UniversityKpis.TotalStudentsTrend)"
+                         TrendLabel="vs last year"
+                         Subtitle="@dashboardData.UniversityKpis.ActiveStudents active" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Overall GPA"
+                         Value="@dashboardData.UniversityKpis.OverallAverageGpa.ToString("F2")"
+                         Icon="@Icons.Material.Filled.School"
+                         IconColor="Color.Success"
+                         TrendValue="@dashboardData.UniversityKpis.GpaTrend"
+                         TrendLabel="vs last year"
+                         Subtitle="University-wide average" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Pass Rate"
+                         Value="@dashboardData.UniversityKpis.OverallPassRate.ToString("F1")%"
+                         Icon="@Icons.Material.Filled.CheckCircle"
+                         IconColor="Color.Info"
+                         TrendValue="@dashboardData.UniversityKpis.PassRateTrend"
+                         TrendLabel="vs last year"
+                         Subtitle="All faculties combined" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Graduation Rate"
+                         Value="@dashboardData.UniversityKpis.OverallGraduationRate.ToString("F1")%"
+                         Icon="@Icons.Material.Filled.EmojiEvents"
+                         IconColor="Color.Warning"
+                         TrendValue="@dashboardData.UniversityKpis.GraduationRateTrend"
+                         TrendLabel="vs last year"
+                         Subtitle="@dashboardData.UniversityKpis.GraduatedStudents graduated" />
+            </MudItem>
+        </MudGrid>
+
+        @* Strategic KPIs Row *@
+        <MudGrid Class="mb-4">
+            <MudItem xs="12" md="4">
+                <MudPaper Elevation="2" Class="pa-4">
+                    <MudStack Spacing="3">
+                        <MudText Typo="Typo.h6">Enrollment Progress</MudText>
+                        <MudStack Spacing="2">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween">
+                                <MudText Typo="Typo.body2">
+                                    <strong>@dashboardData.StrategicKpis.CurrentEnrollment</strong> / 
+                                    @dashboardData.StrategicKpis.EnrollmentTarget students
+                                </MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Primary">
+                                    <strong>@dashboardData.StrategicKpis.EnrollmentTargetProgress.ToString("F0")%</strong>
+                                </MudText>
+                            </MudStack>
+                            <MudProgressLinear Color="Color.Primary" 
+                                               Value="@((double)dashboardData.StrategicKpis.EnrollmentTargetProgress)" 
+                                               Size="Size.Large"
+                                               Rounded="true" />
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+            
+            <MudItem xs="12" md="4">
+                <MudPaper Elevation="2" Class="pa-4">
+                    <MudStack Spacing="3">
+                        <MudText Typo="Typo.h6">Quality Score</MudText>
+                        <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                            <MudText Typo="Typo.h2" Color="@GetQualityScoreColor(dashboardData.StrategicKpis.QualityScore)">
+                                @dashboardData.StrategicKpis.QualityScore.ToString("F1")
+                            </MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                out of 10.0
+                            </MudText>
+                            <MudRating ReadOnly="true" 
+                                       SelectedValue="@((int)Math.Round(dashboardData.StrategicKpis.QualityScore / 2))" 
+                                       MaxValue="5" 
+                                       Color="Color.Warning" />
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+            
+            <MudItem xs="12" md="4">
+                <MudPaper Elevation="2" Class="pa-4">
+                    <MudStack Spacing="3">
+                        <MudText Typo="Typo.h6">Faculty Efficiency</MudText>
+                        <MudStack Spacing="2">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween">
+                                <MudText Typo="Typo.body2">Students per Professor</MudText>
+                                <MudText Typo="Typo.body1"><strong>@dashboardData.StrategicKpis.AverageStudentsPerProfessor.ToString("F0")</strong></MudText>
+                            </MudStack>
+                            <MudStack Row="true" Justify="Justify.SpaceBetween">
+                                <MudText Typo="Typo.body2">Average Class Size</MudText>
+                                <MudText Typo="Typo.body1"><strong>@dashboardData.StrategicKpis.AverageClassSize.ToString("F0")</strong></MudText>
+                            </MudStack>
+                            <MudStack Row="true" Justify="Justify.SpaceBetween">
+                                <MudText Typo="Typo.body2">Pending Approvals</MudText>
+                                <MudChip Size="Size.Small" Color="@(dashboardData.UniversityKpis.PendingGradeApprovals > 0 ? Color.Warning : Color.Success)">
+                                    @dashboardData.UniversityKpis.PendingGradeApprovals
+                                </MudChip>
+                            </MudStack>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        @* Historical Performance Chart *@
+        <MudGrid Class="mb-4">
+            <MudItem xs="12">
+                <MudPaper Elevation="2" Class="pa-4">
+                    <MudText Typo="Typo.h6" Class="mb-4">Historical Performance (5 Years)</MudText>
+                    @if (isLoadingHistorical)
+                    {
+                        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+                    }
+                    else if (historicalData == null || !historicalData.Any())
+                    {
+                        <MudAlert Severity="Severity.Info">No historical data available.</MudAlert>
+                    }
+                    else
+                    {
+                        <ApexCharts.ApexChart TItem="HistoricalDataPoint"
+                                   Title="University Trends"
+                                   Height="350">
+                            <ApexCharts.ApexPointSeries TItem="HistoricalDataPoint"
+                                             Items="historicalData"
+                                             Name="Average GPA"
+                                             SeriesType="ApexCharts.SeriesType.Line"
+                                             XValue="@(e => e.Year)"
+                                             YValue="@(e => (decimal)e.AverageGpa)"
+                                             Color="#2E93fA"
+                                             Smooth="true" />
+                            <ApexCharts.ApexPointSeries TItem="HistoricalDataPoint"
+                                             Items="historicalData"
+                                             Name="Pass Rate (%)"
+                                             SeriesType="ApexCharts.SeriesType.Line"
+                                             XValue="@(e => e.Year)"
+                                             YValue="@(e => (decimal)e.PassRate)"
+                                             Color="#00E396"
+                                             Smooth="true" />
+                            <ApexCharts.ApexPointSeries TItem="HistoricalDataPoint"
+                                             Items="historicalData"
+                                             Name="Graduation Rate (%)"
+                                             SeriesType="ApexCharts.SeriesType.Line"
+                                             XValue="@(e => e.Year)"
+                                             YValue="@(e => (decimal)e.GraduationRate)"
+                                             Color="#FEB019"
+                                             Smooth="true" />
+                        </ApexCharts.ApexChart>
+                    }
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        @* Faculty Comparison *@
+        <MudGrid>
+            <MudItem xs="12">
+                <FacultyComparisonChart Faculties="@dashboardData.FacultyComparisons" IsLoading="@isLoadingFaculties" />
+            </MudItem>
+        </MudGrid>
+    }
+</MudContainer>
+
+@code {
+    private bool isLoading = true;
+    private bool isLoadingHistorical = false;
+    private bool isLoadingFaculties = false;
+    
+    private RectorDashboardDto? dashboardData;
+    private List<HistoricalDataPoint>? historicalData;
+    
+    // This would come from authentication state
+    private Guid currentRectorId = Guid.NewGuid(); // Replace with actual rector ID from auth
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardData();
+    }
+    
+    private async Task LoadDashboardData()
+    {
+        try
+        {
+            isLoading = true;
+            
+            dashboardData = await Http.GetFromJsonAsync<RectorDashboardDto>(
+                $"api/analytics/rector/{currentRectorId}/dashboard");
+            
+            if (dashboardData != null)
+            {
+                LoadHistoricalData();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading dashboard: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    private void LoadHistoricalData()
+    {
+        try
+        {
+            isLoadingHistorical = true;
+            
+            if (dashboardData?.HistoricalPerformance != null)
+            {
+                historicalData = dashboardData.HistoricalPerformance
+                    .Select(x => new HistoricalDataPoint
+                    {
+                        Year = x.AcademicYear,
+                        AverageGpa = x.AverageGpa,
+                        PassRate = x.PassRate,
+                        GraduationRate = x.GraduationRate
+                    })
+                    .ToList();
+            }
+        }
+        finally
+        {
+            isLoadingHistorical = false;
+        }
+    }
+    
+    private Color GetQualityScoreColor(decimal score) => score switch
+    {
+        >= 9.0m => Color.Success,
+        >= 8.0m => Color.Info,
+        >= 7.0m => Color.Primary,
+        >= 6.0m => Color.Warning,
+        _ => Color.Error
+    };
+    
+    public class HistoricalDataPoint
+    {
+        public string Year { get; set; } = string.Empty;
+        public decimal AverageGpa { get; set; }
+        public decimal PassRate { get; set; }
+        public decimal GraduationRate { get; set; }
+    }
+}

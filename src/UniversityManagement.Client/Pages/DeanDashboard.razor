@@ -1,0 +1,284 @@
+@page "/dean/dashboard"
+@using UniversityManagement.Shared.DTOs.Analytics
+@using UniversityManagement.Client.Components.Analytics
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@attribute [Authorize(Roles = "dean")]
+
+<PageTitle>Dean Dashboard - Analytics</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-4">
+    @if (isLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+        <MudText Align="Align.Center" Class="mt-4">Loading dashboard data...</MudText>
+    }
+    else if (dashboardData == null)
+    {
+        <MudAlert Severity="Severity.Error">Failed to load dashboard data. Please try again later.</MudAlert>
+    }
+    else
+    {
+        @* Header Section *@
+        <MudPaper Elevation="0" Class="pa-4 mb-4">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">Welcome, Dean @dashboardData.DeanName!</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Secondary">
+                    @dashboardData.FacultyName • @dashboardData.TotalStudents students across @dashboardData.ProgramMetrics.Count programs
+                </MudText>
+            </MudStack>
+        </MudPaper>
+
+        @* KPI Cards Row *@
+        <MudGrid Class="mb-4">
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Total Students"
+                         Value="@dashboardData.TotalStudents.ToString()"
+                         Icon="@Icons.Material.Filled.People"
+                         IconColor="Color.Primary"
+                         TrendValue="@(dashboardData.TotalStudentsTrend)"
+                         TrendLabel="vs last year"
+                         Subtitle="Across all programs" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Overall Pass Rate"
+                         Value="@dashboardData.OverallPassRate.ToString("F1")%"
+                         Icon="@Icons.Material.Filled.CheckCircle"
+                         IconColor="Color.Success"
+                         TrendValue="@dashboardData.PassRateTrend"
+                         TrendLabel="vs last year"
+                         Subtitle="@GetPassRateRating(dashboardData.OverallPassRate)" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Average GPA"
+                         Value="@dashboardData.AverageGpa.ToString("F2")"
+                         Icon="@Icons.Material.Filled.School"
+                         IconColor="Color.Info"
+                         TrendValue="@dashboardData.GpaTrend"
+                         TrendLabel="vs last year"
+                         Subtitle="Faculty-wide" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <KpiCard Title="Graduation Rate"
+                         Value="@dashboardData.GraduationRate.ToString("F1")%"
+                         Icon="@Icons.Material.Filled.EmojiEvents"
+                         IconColor="Color.Warning"
+                         TrendValue="@dashboardData.GraduationRateTrend"
+                         TrendLabel="vs last year"
+                         Subtitle="@GetGraduationRateRating(dashboardData.GraduationRate)" />
+            </MudItem>
+        </MudGrid>
+
+        @* Program Comparison and Enrollment Trends *@
+        <MudGrid Class="mb-4">
+            <MudItem xs="12" md="8">
+                <ProgramComparisonChart Programs="@dashboardData.ProgramMetrics" IsLoading="@isLoadingPrograms" />
+            </MudItem>
+            
+            <MudItem xs="12" md="4">
+                <MudPaper Elevation="2" Class="pa-4">
+                    <MudText Typo="Typo.h6" Class="mb-4">Enrollment Trends</MudText>
+                    @if (isLoadingEnrollment)
+                    {
+                        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+                    }
+                    else if (enrollmentTrendData == null || !enrollmentTrendData.Any())
+                    {
+                        <MudAlert Severity="Severity.Info">No enrollment data available.</MudAlert>
+                    }
+                    else
+                    {
+                        <ApexCharts.ApexChart TItem="EnrollmentDataPoint"
+                                   Title="5-Year Enrollment"
+                                   Height="400">
+                            <ApexCharts.ApexPointSeries TItem="EnrollmentDataPoint"
+                                             Items="enrollmentTrendData"
+                                             Name="Total Students"
+                                             SeriesType="ApexCharts.SeriesType.Line"
+                                             XValue="@(e => e.Year)"
+                                             YValue="@(e => (decimal)e.TotalEnrollments)"
+                                             Color="#775DD0"
+                                             Smooth="true" />
+                        </ApexCharts.ApexChart>
+                    }
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        @* At-Risk Students Table *@
+        <MudGrid Class="mb-4">
+            <MudItem xs="12">
+                <AtRiskStudentsTable Students="@dashboardData.AtRiskStudents" 
+                                     IsLoading="@isLoadingAtRisk"
+                                     OnContactStudent="@HandleContactStudent" />
+            </MudItem>
+        </MudGrid>
+
+        @* Grade Approval Queue *@
+        <MudGrid>
+            <MudItem xs="12">
+                <MudPaper Elevation="2" Class="pa-4">
+                    <MudStack Spacing="3">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                            <MudText Typo="Typo.h6">Grade Approval Queue</MudText>
+                            <MudChip Color="Color.Warning" Size="Size.Small">
+                                @dashboardData.GradeApprovalQueue.PendingCount pending
+                            </MudChip>
+                        </MudStack>
+                        
+                        <MudGrid>
+                            <MudItem xs="3">
+                                <MudPaper Outlined="true" Class="pa-3">
+                                    <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                                        <MudIcon Icon="@Icons.Material.Filled.HourglassTop" Color="Color.Warning" Size="Size.Large" />
+                                        <MudText Typo="Typo.h5">@dashboardData.GradeApprovalQueue.PendingCount</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">Pending</MudText>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="3">
+                                <MudPaper Outlined="true" Class="pa-3">
+                                    <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                                        <MudIcon Icon="@Icons.Material.Filled.RateReview" Color="Color.Info" Size="Size.Large" />
+                                        <MudText Typo="Typo.h5">@dashboardData.GradeApprovalQueue.InReviewCount</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">In Review</MudText>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="3">
+                                <MudPaper Outlined="true" Class="pa-3">
+                                    <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Large" />
+                                        <MudText Typo="Typo.h5">@dashboardData.GradeApprovalQueue.ApprovedCount</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">Approved</MudText>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="3">
+                                <MudPaper Outlined="true" Class="pa-3">
+                                    <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                                        <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Error" Size="Size.Large" />
+                                        <MudText Typo="Typo.h5">@dashboardData.GradeApprovalQueue.ContestedCount</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">Contested</MudText>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+                        
+                        @if (dashboardData.GradeApprovalQueue.Items.Any())
+                        {
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" 
+                                       StartIcon="@Icons.Material.Filled.Visibility"
+                                       OnClick="@(() => ShowGradeApprovalDialog())">
+                                Review Queue (@dashboardData.GradeApprovalQueue.Items.Count items)
+                            </MudButton>
+                        }
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    }
+</MudContainer>
+
+@code {
+    private bool isLoading = true;
+    private bool isLoadingPrograms = false;
+    private bool isLoadingEnrollment = false;
+    private bool isLoadingAtRisk = false;
+    
+    private DeanDashboardDto? dashboardData;
+    private List<EnrollmentDataPoint>? enrollmentTrendData;
+    
+    // This would come from authentication state
+    private Guid currentDeanId = Guid.NewGuid(); // Replace with actual dean ID from auth
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardData();
+    }
+    
+    private async Task LoadDashboardData()
+    {
+        try
+        {
+            isLoading = true;
+            
+            dashboardData = await Http.GetFromJsonAsync<DeanDashboardDto>(
+                $"api/analytics/dean/{currentDeanId}/dashboard");
+            
+            if (dashboardData != null)
+            {
+                LoadEnrollmentTrendData();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading dashboard: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    private void LoadEnrollmentTrendData()
+    {
+        try
+        {
+            isLoadingEnrollment = true;
+            
+            if (dashboardData?.EnrollmentTrends != null)
+            {
+                enrollmentTrendData = dashboardData.EnrollmentTrends
+                    .Select(x => new EnrollmentDataPoint
+                    {
+                        Year = x.AcademicYear,
+                        TotalEnrollments = x.TotalEnrollments
+                    })
+                    .ToList();
+            }
+        }
+        finally
+        {
+            isLoadingEnrollment = false;
+        }
+    }
+    
+    private async Task HandleContactStudent(AtRiskStudentDto student)
+    {
+        Snackbar.Add($"Contacting {student.StudentName}...", Severity.Info);
+        await Task.CompletedTask;
+    }
+    
+    private void ShowGradeApprovalDialog()
+    {
+        Snackbar.Add("Opening grade approval queue...", Severity.Info);
+    }
+    
+    // Helper methods
+    private string GetPassRateRating(decimal passRate) => passRate switch
+    {
+        >= 85m => "Excellent",
+        >= 75m => "Very Good",
+        >= 65m => "Good",
+        >= 55m => "Satisfactory",
+        _ => "Needs Improvement"
+    };
+    
+    private string GetGraduationRateRating(decimal graduationRate) => graduationRate switch
+    {
+        >= 85m => "Excellent",
+        >= 75m => "Very Good",
+        >= 65m => "Good",
+        _ => "Needs Improvement"
+    };
+    
+    public class EnrollmentDataPoint
+    {
+        public string Year { get; set; } = string.Empty;
+        public int TotalEnrollments { get; set; }
+    }
+}

@@ -32,6 +32,15 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script>
+        function downloadFile(fileName, base64String, contentType) {
+            const linkSource = `data:${contentType};base64,${base64String}`;
+            const downloadLink = document.createElement('a');
+            downloadLink.href = linkSource;
+            downloadLink.download = fileName;
+            downloadLink.click();
+        }
+    </script>
 </body>
 
 </html>
