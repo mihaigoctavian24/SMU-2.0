@@ -216,3 +216,4 @@
 /Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.API/obj/Debug/net10.0/Universi.F3D8C270.Up2Date
 /Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.API/obj/Debug/net10.0/UniversityManagement.API.genruntimeconfig.cache
 /Users/octavianmihai/.qoder/worktree/SMU-2.0/qoder/unnamed-task-1764451087/src/UniversityManagement.API/obj/Debug/net10.0/ref/UniversityManagement.API.dll
+/Users/octavianmihai/Documents/GitHub/SMU-2.0/src/UniversityManagement.API/bin/Debug/net10.0/appsettings.Production.json
